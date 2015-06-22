@@ -18,16 +18,6 @@
       <column name="hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="id_bots"/>
     </table>
-    <table name="dsh" schema="" catalog="rpggame" type="TABLE">
-      <column name="id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <column name="title" sqlType="VARCHAR" precision="45" scale="0" nullable="false" jdbcType="12"/>
-      <column name="description" sqlType="VARCHAR" precision="45" scale="0" nullable="false" jdbcType="12"/>
-      <column name="rating" sqlType="DOUBLE" precision="22" scale="0" nullable="false" jdbcType="8"/>
-      <column name="published" sqlType="TINYINT" precision="3" scale="0" nullable="false" jdbcType="-6"/>
-      <column name="created" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
-      <column name="icon" sqlType="LONGBLOB" precision="2147483647" scale="0" nullable="false" jdbcType="-4"/>
-      <primary-key name="PRIMARY" columns="id"/>
-    </table>
     <table name="players" schema="" catalog="rpggame" type="TABLE">
       <column name="id_players" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
       <column name="name" sqlType="VARCHAR" precision="45" scale="0" nullable="false" jdbcType="12"/>
@@ -40,12 +30,6 @@
       <column name="hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="max_hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="id_players"/>
-    </table>
-    <table name="user" schema="" catalog="rpggame" type="TABLE">
-      <column name="id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
-      <column name="username" sqlType="VARCHAR" precision="40" scale="0" nullable="false" jdbcType="12"/>
-      <column name="password" sqlType="VARCHAR" precision="40" scale="0" nullable="false" jdbcType="12"/>
-      <primary-key name="PRIMARY" columns="id"/>
     </table>
   </data-source>
 </component>

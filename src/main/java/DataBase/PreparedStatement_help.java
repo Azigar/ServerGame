@@ -52,8 +52,8 @@ public class PreparedStatement_help {
             ResultSet res = preparedStatement.executeQuery();
 
             while (res.next()){
-                int id = res.getInt(1);  //пишу в сеттер User результат с первого поля - 1
-                String title = res.getString(2); //пишу в сеттер User результат со второго поля - 2
+                int id = res.getInt(1);  //пишу в сеттер Bots результат с первого поля - 1
+                String title = res.getString(2); //пишу в сеттер Bots результат со второго поля - 2
                 String description = res.getString(3);
                 float rating = res.getFloat("rating");
                 boolean published = res.getBoolean("published");

@@ -56,10 +56,10 @@ public class Statement_help {
             ResultSet res = statement.executeQuery(query);  //запускаю запрос
             //в цикле прохожу всю таблицу и пишу данные в сеттеры
             while (res.next()){
-                User user = new User(); //подключаю класс User
-                user.setId(res.getInt(1));  //пишу в сеттер User результат с первого поля - 1
-                user.setUsername(res.getString(2)); //пишу в сеттер User результат со второго поля - 2
-                user.setPassword(res.getString("password")); //пишу в сеттер User результат со третьего поля - password (можно указывать номер поля или его название)
+                Bots user = new Bots(); //подключаю класс Bots
+                user.setId(res.getInt(1));  //пишу в сеттер Bots результат с первого поля - 1
+                user.setUsername(res.getString(2)); //пишу в сеттер Bots результат со второго поля - 2
+                user.setPassword(res.getString("password")); //пишу в сеттер Bots результат со третьего поля - password (можно указывать номер поля или его название)
 
                 System.out.println(user);
 

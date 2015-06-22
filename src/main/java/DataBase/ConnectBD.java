@@ -10,7 +10,7 @@ import java.sql.SQLException;
  */
 public class ConnectBD {
 
-    //Константы для подключение к БД
+    ///Константы для подключение к БД
     private final String DB_NAME = "rpggame";
     private final String URL = "jdbc:mysql://localhost:3306/"+DB_NAME;
     private final String USER = "root";

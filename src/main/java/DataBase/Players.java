@@ -7,7 +7,7 @@ import java.sql.Date;
  */
 public class Players {
 
-    private int id_players;
+    private int id;
     private String name;
     private Date data_begin;
     private int lvl;
@@ -18,13 +18,13 @@ public class Players {
     private int hp;
     private int max_hp;
 
-
-    public int getId_players() {
-        return id_players;
+    //геттеры и сеттеры
+    public int getId() {
+        return id;
     }
 
-    public void setId_players(int id_players) {
-        this.id_players = id_players;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

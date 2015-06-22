@@ -9,7 +9,7 @@ import java.sql.Statement;
  * Created by Azigar on 21.06.2015.
  */
 public class Statement_help {
-    //Константы для подключение к БД
+    ///Константы для подключение к БД
     private static final String DB_NAME = "rpggame";
     private static final String URL = "jdbc:mysql://localhost:3306/"+DB_NAME;
     private static final String USER = "root";

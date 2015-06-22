@@ -5,7 +5,7 @@ package DataBase;
  */
 public class Bots {
 
-    private int id_bots;
+    private int id;
     private String name;
     private int lvl;
     private int str;
@@ -13,24 +13,25 @@ public class Bots {
     private int inst;
     private int def;
     private int hp;
+    private int live;
 
-    //метод для коректного вывода на экран обьекта
+    ///метод для коректного вывода на экран обьекта
     @Override
     public String toString() {
         return getClass().getSimpleName()
             + "{"
-            +  "id: " + id_bots
+            +  "id: " + id
             +  ", name: " + name
             +  ", lvl: " + lvl
             + "}";
     }
 
-    public void setId_bots(int id_bots) {
-        this.id_bots = id_bots;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public int getId_bots() {
-        return id_bots;
+    public int getId() {
+        return id;
     }
 
     public void setName(String name) {
@@ -87,5 +88,13 @@ public class Bots {
 
     public void setHp(int hp) {
         this.hp = hp;
+    }
+
+    public int getLive() {
+        return live;
+    }
+
+    public void setLive(int live) {
+        this.live = live;
     }
 }

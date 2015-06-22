@@ -20,7 +20,7 @@ public class PreparedStatement_help {
 
         ConnectBD conn = new ConnectBD();
 
-        /*
+        /*/
         //ввод данных в таблицу
         try {
             preparedStatement = conn.getConnection().prepareStatement(INSERT_NEW);

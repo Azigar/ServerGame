@@ -6,209 +6,166 @@ import java.io.InputStreamReader;
 import java.util.Random;
 
 /**
- * Created by Azigar on 25.05.2015.
+ * Created by Azigar on 02.06.2015.
  */
 public class Fight {
 
-    //òåêñò ñ ğåñóğñîâ
-    static String txtG = " â ãîëîâó";
-    static String txtT = " â òîğñ";
-    static String txtN = " â íîãè";
+    private String txtUdar;
+    private String txtComent;
 
-    static String txtUdar = null;
-
-    //ìåòîä áîÿ è âîçâğàò çíà÷åíèå ÎÇ ïğîòèâíèêà
-    public static int Fight(boolean liveAtk, String nameAtk, int minUronAtk, int maxUronAtk, int dexAtk, int instAtk,
-                            boolean liveDef, String nameDef, int dexDef, int instDef, int defDef, int hpDef) throws IOException {
+    //Ğ¼ĞµÑ‚Ğ¾Ğ´ Ğ±Ğ¾Ñ Ğ¸ Ğ²Ğ¾Ğ·Ğ²Ñ€Ğ°Ñ‚ Ğ·Ğ½Ğ°Ñ‡ĞµĞ½Ğ¸Ğµ ĞĞ— Ğ¿Ñ€Ğ¾Ñ‚Ğ¸Ğ²Ğ½Ğ¸ĞºĞ°
+    public int Fight(boolean liveAtk, String nameAtk, int minUronAtk, int maxUronAtk, double dexAtk, double instAtk,
+                            boolean liveDef, String nameDef, double dexDef, double instDef, int defDef, int hpDef, int nap){
         int uron=0;
-        txtHod(nameAtk); //Âûâîä òåêñòà î òîì ÷åé õîä
-        //Îïğåäåëÿåò øàñ áëîêà
-        boolean shansBlokAtk = ShansBlok(liveAtk, liveDef, nameAtk, nameDef);
-        //ïîïàäåò ëè àòàêóşùèé èãğîê
-        boolean shansDexAtk = Shans(dexAtk, dexDef);
-        //íàíåñåò ëè îí êğèòè÷åñêèé óğîí
-        boolean shansKritAtk = Shans(instAtk, instDef);
-        //åñëè ïîïàë â ïğîòèâíèêà
-        if (shansDexAtk == true) {
-            //è íå ïîïàë â áëîê
-            if (shansBlokAtk == false) {
-                //è íàíåñ êğèò óğîí
-                if (shansKritAtk == true) {
-                    //ğàñ÷åò ñèëû ÊĞÈÒÈ×ÅÑÎÃÎ Óğîíà
+        //ĞµÑĞ»Ğ¸ Ğ¿Ğ¾Ğ¿Ğ°Ğ» Ğ² Ğ¿Ñ€Ğ¾Ñ‚Ğ¸Ğ²Ğ½Ğ¸ĞºĞ°
+        if (ShansBlok(liveAtk, liveDef, nameAtk, nameDef, nap) == true) {
+            //Ğ¸ Ğ½Ğµ Ğ¿Ğ¾Ğ¿Ğ°Ğ» Ğ² Ğ±Ğ»Ğ¾Ğº
+            if (Shans(dexAtk, dexDef) == false) {
+                //Ğ¸ Ğ½Ğ°Ğ½ĞµÑ ĞºÑ€Ğ¸Ñ‚ ÑƒÑ€Ğ¾Ğ½
+                if (Shans(instAtk, instDef) == true) {
+                    //Ñ€Ğ°ÑÑ‡ĞµÑ‚ ÑĞ¸Ğ»Ñ‹ ĞšĞ Ğ˜Ğ¢Ğ˜Ğ§Ğ•Ğ¡ĞĞ“Ğ Ğ£Ñ€Ğ¾Ğ½Ğ°
                     uron = SrtKritUron(minUronAtk, maxUronAtk, defDef, nameAtk);
-                } else { //íàíåñ îáû÷íûé óäàğ
-                    //ğàñ÷åò ñèëû óğîíà
+                } else { //Ğ½Ğ°Ğ½ĞµÑ Ğ¾Ğ±Ñ‹Ñ‡Ğ½Ñ‹Ğ¹ ÑƒĞ´Ğ°Ñ€
+                    //Ñ€Ğ°ÑÑ‡ĞµÑ‚ ÑĞ¸Ğ»Ñ‹ ÑƒÑ€Ğ¾Ğ½Ğ°
                     uron = SrtUron(minUronAtk, maxUronAtk, defDef, nameAtk);
                 }
-                //ïîïàë â áëîê
+                //Ğ¿Ğ¾Ğ¿Ğ°Ğ» Ğ² Ğ±Ğ»Ğ¾Ğº
             } else {
-                //è íàíåñ êğèò óğîí  (ïğîáèë áëîê)
-                if (shansKritAtk == true) {
-                    //ğàñ÷åò ñèëû óğîíà
+                //Ğ¸ Ğ½Ğ°Ğ½ĞµÑ ĞºÑ€Ğ¸Ñ‚ ÑƒÑ€Ğ¾Ğ½  (Ğ¿Ñ€Ğ¾Ğ±Ğ¸Ğ» Ğ±Ğ»Ğ¾Ğº)
+                if (Shans(instAtk, instDef) == true) {
+                    //Ñ€Ğ°ÑÑ‡ĞµÑ‚ ÑĞ¸Ğ»Ñ‹ ÑƒÑ€Ğ¾Ğ½Ğ°
                     uron = SrtUronBlok(minUronAtk, maxUronAtk, defDef, nameAtk);
                 } else {
                     int txt = randTxt();
                     switch (txt) {
                         case 1:
-                            System.out.println(nameDef + " óäà÷íî áëîêèğîâàë óäàğ");
+                            setTxtComent(nameDef + " ÑƒĞ´Ğ°Ñ‡Ğ½Ğ¾ Ğ±Ğ»Ğ¾ĞºĞ¸Ñ€Ğ¾Ğ²Ğ°Ğ» ÑƒĞ´Ğ°Ñ€");
                             break;
                         case 2:
-                            System.out.println(nameDef + " óìåëî ïàğèğîâàë óäàğ");
+                            setTxtComent(nameDef + " ÑƒĞ¼ĞµĞ»Ğ¾ Ğ¿Ğ°Ñ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ» ÑƒĞ´Ğ°Ñ€");
                             break;
                     }
                 }
             }
-            //ïğîìàçàë
+            //Ğ¿Ñ€Ğ¾Ğ¼Ğ°Ğ·Ğ°Ğ»
         } else {
             int txt = randTxt();
             switch (txt) {
                 case 1:
-                    System.out.println(nameAtk + " ïğîìàçàë");
+                    setTxtComent(nameAtk + " Ğ¿Ñ€Ğ¾Ğ¼Ğ°Ğ·Ğ°Ğ»");
                     break;
                 case 2:
-                    System.out.println(nameDef + " óêëîíèëñÿ îò óäàğà");
+                    setTxtComent(nameDef + " ÑƒĞºĞ»Ğ¾Ğ½Ğ¸Ğ»ÑÑ Ğ¾Ñ‚ ÑƒĞ´Ğ°Ñ€Ğ°");
                     break;
             }
         }
-        //óìåíøàåì ê-âî ÎÇ ïğîòèâíèêà
+        //ÑƒĞ¼ĞµĞ½ÑˆĞ°ĞµĞ¼ Ğº-Ğ²Ğ¾ ĞĞ— Ğ¿Ñ€Ğ¾Ñ‚Ğ¸Ğ²Ğ½Ğ¸ĞºĞ°
         hpDef = hpDef - uron;
         return hpDef;
     }
 
-    //ğàñ÷åò øàíñà
-    public static boolean Shans(int statAtk, int statDef) {
-        //ïåğâîíà÷àëüíî øàíñ-ëîæ
+    //Ñ€Ğ°ÑÑ‡ĞµÑ‚ ÑˆĞ°Ğ½ÑĞ°
+    public static boolean Shans(double statAtk, double statDef) {
+        //Ğ¿ĞµÑ€Ğ²Ğ¾Ğ½Ğ°Ñ‡Ğ°Ğ»ÑŒĞ½Ğ¾ ÑˆĞ°Ğ½Ñ-Ğ»Ğ¾Ğ¶
         boolean i = false;
-        //ğàñ÷åò øàíñà 20+(ñòàò+ëâë)-(ñòàò+ëâë)
+        //Ñ€Ğ°ÑÑ‡ĞµÑ‚ ÑˆĞ°Ğ½ÑĞ° 20+(ÑÑ‚Ğ°Ñ‚+Ğ»Ğ²Ğ»)-(ÑÑ‚Ğ°Ñ‚+Ğ»Ğ²Ğ»)
         double shans = (50 + (statAtk - statDef)) / 100;
-        //âñåãäà åñòü àíòèøàíñ
+        //Ğ²ÑĞµĞ³Ğ´Ğ° ĞµÑÑ‚ÑŒ Ğ°Ğ½Ñ‚Ğ¸ÑˆĞ°Ğ½Ñ
         if (shans >= 0.87) shans = 0.87;
         if (shans <= 0.13) shans = 0.13;
-        String str = Double.toString(shans); //ïåğåâîä double â String
-        //ãåíåğàòîğ ñëó÷àíûõ ÷èñåë îò 0,1 äî 1
+        String str = Double.toString(shans); //Ğ¿ĞµÑ€ĞµĞ²Ğ¾Ğ´ double Ğ² String
+        //Ğ³ĞµĞ½ĞµÑ€Ğ°Ñ‚Ğ¾Ñ€ ÑĞ»ÑƒÑ‡Ğ°Ğ½Ñ‹Ñ… Ñ‡Ğ¸ÑĞµĞ» Ğ¾Ñ‚ 0,1 Ğ´Ğ¾ 1
         double random = Math.random();
-        //åñëè ğàíîì óäîëåòâîğèòåëüíûé, òîãäà øàñí-ïğàâäà
+        //ĞµÑĞ»Ğ¸ Ñ€Ğ°Ğ½Ğ¾Ğ¼ ÑƒĞ´Ğ¾Ğ»ĞµÑ‚Ğ²Ğ¾Ñ€Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹, Ñ‚Ğ¾Ğ³Ğ´Ğ° ÑˆĞ°ÑĞ½-Ğ¿Ñ€Ğ°Ğ²Ğ´Ğ°
         if (random <= shans) i = true;
-        //âîçâğàùàş çíà÷åíèå
+        //Ğ²Ğ¾Ğ·Ğ²Ñ€Ğ°Ñ‰Ğ°Ñ Ğ·Ğ½Ğ°Ñ‡ĞµĞ½Ğ¸Ğµ
         return i;
     }
 
-    //ğàñ÷åò ñèëû óğîíà
+    //Ñ€Ğ°ÑÑ‡ĞµÑ‚ ÑĞ¸Ğ»Ñ‹ ÑƒÑ€Ğ¾Ğ½Ğ°
     private static int Str(int strmin, int strmax) {
         Random random = new Random();
         return random.nextInt(strmin + 1) + (strmax - strmin);
     }
 
-    //ğàíäîì òåêñòà
-    private static int randTxt() {
-        Random random = new Random();
-        return random.nextInt(2) + 1;
-    }
-
-    //ğàíäîì íàïğàâëåíèå àòàêè/çàùèòû
+    //Ñ€Ğ°Ğ½Ğ´Ğ¾Ğ¼ Ğ½Ğ°Ğ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğ¸Ğµ Ğ°Ñ‚Ğ°ĞºĞ¸/Ğ·Ğ°Ñ‰Ğ¸Ñ‚Ñ‹
     private static int randUdar() {
         Random random = new Random();
         return random.nextInt(3) + 1;
     }
 
-    //òåêñòîâêà Íà÷àëî íîâîãî õîäà
-    private static void txtHod(String name) {
-        System.out.println();
-        System.out.println("Õîä " + name + "à");
-    }
-
-    //Øàíñ áëîêà
-    private static boolean ShansBlok(boolean liveAtk, boolean liveDef, String nameAtk, String nameDef) throws IOException {
-        boolean shansBlok = false; // áëîê - ëîæ
+    //Ğ¨Ğ°Ğ½Ñ Ğ±Ğ»Ğ¾ĞºĞ°
+    private boolean ShansBlok(boolean liveAtk, boolean liveDef, String nameAtk, String nameDef, int nap){
+        boolean shansBlok = false; // Ğ±Ğ»Ğ¾Ğº - Ğ»Ğ¾Ğ¶
         int udarAtk, udarDef;
-        //âèáîğ íàïğàâëåíèå óäàğà ÀÒÀÊóşùåãî èãğîêà
-        udarAtk = Udar(liveAtk, nameAtk);
-        //âèáîğ íàïğàâëåíèå çàùèòû çàùèùàşùåãî èãğîêà
-        udarAtk = Udar(liveDef, nameDef);
-        //òåêñòîâêà äëÿ óäàğà
+        //Ğ²Ğ¸Ğ±Ğ¾Ñ€ Ğ½Ğ°Ğ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğ¸Ğµ ÑƒĞ´Ğ°Ñ€Ğ° ĞĞ¢ĞĞšÑƒÑÑ‰ĞµĞ³Ğ¾ Ğ¸Ğ³Ñ€Ğ¾ĞºĞ°
+        udarAtk = Udar(liveAtk, nameAtk, nap);
+        //Ğ²Ğ¸Ğ±Ğ¾Ñ€ Ğ½Ğ°Ğ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğ¸Ğµ Ğ·Ğ°Ñ‰Ğ¸Ñ‚Ñ‹ Ğ·Ğ°Ñ‰Ğ¸Ñ‰Ğ°ÑÑ‰ĞµĞ³Ğ¾ Ğ¸Ğ³Ñ€Ğ¾ĞºĞ°
+        udarDef = Udar(liveDef, nameDef, nap);
+        //Ñ‚ĞµĞºÑÑ‚Ğ¾Ğ²ĞºĞ° Ğ´Ğ»Ñ ÑƒĞ´Ğ°Ñ€Ğ°
         switch (udarAtk) {
             case 1:
-                txtUdar = txtG;
+                txtUdar = " Ğ² Ğ³Ğ¾Ğ»Ğ¾Ğ²Ñƒ";
                 break;
             case 2:
-                txtUdar = txtT;
+                txtUdar = " Ğ² Ñ‚Ğ¾Ñ€Ñ";
                 break;
             case 3:
-                txtUdar = txtN;
+                txtUdar = " Ğ² Ğ½Ğ¾Ğ³Ğ¸";
         }
-        //åñëè âûáîğ íàïğàâëåíå ñîâïàäàåò, òî áîê - ïğàâäà
-        if (udarAtk==udarAtk) shansBlok = true;
+        //ĞµÑĞ»Ğ¸ Ğ²Ñ‹Ğ±Ğ¾Ñ€ Ğ½Ğ°Ğ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğµ ÑĞ¾Ğ²Ğ¿Ğ°Ğ´Ğ°ĞµÑ‚, Ñ‚Ğ¾ Ğ±Ğ»Ğ¾Ğº - Ğ¿Ñ€Ğ°Ğ²Ğ´Ğ°
+        if (udarAtk==udarDef) shansBlok = true;
         return shansBlok;
     }
 
-    //âèáîğ íàïğàâëåíèå óäàğà/çàùèòû
-    private static int Udar(boolean live, String name) throws IOException {
-        BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
+    //Ğ²Ğ¸Ğ±Ğ¾Ñ€ Ğ½Ğ°Ğ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğ¸Ğµ ÑƒĞ´Ğ°Ñ€Ğ°/Ğ·Ğ°Ñ‰Ğ¸Ñ‚Ñ‹
+    private static int Udar(boolean live, String name, int nap){
         int udar;
-        if (live == true) { //åñëè èãğîê íå ÁÎÒ
-            do {
-                System.out.println(name + ", âèáåğèòå íàïğàâëåíèå: 1 -" + txtG + ", 2 -" + txtT + ", 3 -" + txtN);
-                udar = Integer.parseInt(read.readLine());
-                if ((udar == 1) || (udar == 2) || (udar == 3)) break;
-            } while (true);
-        } else udar = randUdar();
+        if (live == true) udar=nap;
+        else udar = randUdar();
         return udar;
     }
 
-    //ğàñ÷åò ñèëû ÊĞÈÒÈ×ÅÑÎÃÎ Óğîíà
-    private static int SrtKritUron(int srtMin, int srtMax, int def, String name) {
+    //Ñ€Ğ°ÑÑ‡ĞµÑ‚ ÑĞ¸Ğ»Ñ‹ ĞšĞ Ğ˜Ğ¢Ğ˜Ğ§Ğ•Ğ¡ĞĞ“Ğ Ğ£Ñ€Ğ¾Ğ½Ğ°
+    private int SrtKritUron(int srtMin, int srtMax, int def, String name) {
         int srtKritUron = (Str(srtMin, srtMax) * 2) - (def / 10);
-        System.out.println(name + " íàíåñ ÊĞÈÒÈ×ÅÑÊÈÉ óäàğ" + txtUdar + " (óğîí " + srtKritUron + "). ");
+        setTxtComent(name + " Ğ½Ğ°Ğ½ĞµÑ ĞšĞ Ğ˜Ğ¢Ğ˜Ğ§Ğ•Ğ¡ĞšĞ˜Ğ™ ÑƒĞ´Ğ°Ñ€" + txtUdar + " (ÑƒÑ€Ğ¾Ğ½ " + srtKritUron + ")");
         return srtKritUron;
     }
 
-    //ğàñ÷åò ñèëû Îáû÷íîãî Óğîíà
-    private static int SrtUron(int srtMin, int srtMax, int def, String name) {
+    //Ñ€Ğ°ÑÑ‡ĞµÑ‚ ÑĞ¸Ğ»Ñ‹ ĞĞ±Ñ‹Ñ‡Ğ½Ğ¾Ğ³Ğ¾ Ğ£Ñ€Ğ¾Ğ½Ğ°
+    private int SrtUron(int srtMin, int srtMax, int def, String name) {
         int srtUron = Str(srtMin, srtMax) - (def / 10);
         int ave = (srtMin + srtMax) / 2;
         if (srtUron <= ave)
-            System.out.println(name + " íàíåñ íåçíà÷èòåëüíûé óäàğ" + txtUdar + " (óğîí " + srtUron + "). ");
+            setTxtComent(name + " Ğ½Ğ°Ğ½ĞµÑ Ğ½ĞµĞ·Ğ½Ğ°Ñ‡Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹ ÑƒĞ´Ğ°Ñ€" + txtUdar + " (ÑƒÑ€Ğ¾Ğ½ " + srtUron + ")");
         else
-            System.out.println(name + " íàíåñ ñåğüåçíûé óäàğ" + txtUdar + " (óğîí " + srtUron + "). ");
+            setTxtComent(name + " Ğ½Ğ°Ğ½ĞµÑ ÑĞµÑ€ÑŒĞµĞ·Ğ½Ñ‹Ğ¹ ÑƒĞ´Ğ°Ñ€" + txtUdar + " (ÑƒÑ€Ğ¾Ğ½ " + srtUron + ")");
         return srtUron;
     }
 
-    //ğàñ÷åò ñèëû Óğîíà ÷åğåç áëîê
-    private static int SrtUronBlok(int srtMin, int srtMax, int def, String name) {
+    //Ñ€Ğ°ÑÑ‡ĞµÑ‚ ÑĞ¸Ğ»Ñ‹ Ğ£Ñ€Ğ¾Ğ½Ğ° Ñ‡ĞµÑ€ĞµĞ· Ğ±Ğ»Ğ¾Ğº
+    private int SrtUronBlok(int srtMin, int srtMax, int def, String name) {
         int srtUronBlok = Str(srtMin, srtMax) - (def / 10);
         int ave = (srtMin + srtMax) / 2;
         if (srtUronBlok <= ave)
-            System.out.println(name + " ïğîáèë áëîê è íàíåñ íåçíà÷èòåëüíûé óäàğ" + txtUdar + " (óğîí " + srtUronBlok + "). ");
+            setTxtComent(name + " Ğ¿Ñ€Ğ¾Ğ±Ğ¸Ğ» Ğ±Ğ»Ğ¾Ğº Ğ¸ Ğ½Ğ°Ğ½ĞµÑ Ğ½ĞµĞ·Ğ½Ğ°Ñ‡Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹ ÑƒĞ´Ğ°Ñ€" + txtUdar + " (ÑƒÑ€Ğ¾Ğ½ " + srtUronBlok + ")");
         else
-            System.out.println(name + " ïğîáèâ áëîê ïğîòèâíèêà, íàíåñ ñåğüåçíûé óäàğ" + txtUdar + " (óğîí " + srtUronBlok + "). ");
+            setTxtComent(name + " Ğ¿Ñ€Ğ¾Ğ±Ğ¸Ğ² Ğ±Ğ»Ğ¾Ğº Ğ¿Ñ€Ğ¾Ñ‚Ğ¸Ğ²Ğ½Ğ¸ĞºĞ°, Ğ½Ğ°Ğ½ĞµÑ ÑĞµÑ€ÑŒĞµĞ·Ğ½Ñ‹Ğ¹ ÑƒĞ´Ğ°Ñ€" + txtUdar + " (ÑƒÑ€Ğ¾Ğ½ " + srtUronBlok + ")");
         return srtUronBlok;
     }
 
-    //òåêñòîâêà î òîì, êòî ïåğâûé íàïàë
-    static void TxtFist(String nameAtk, String nameDef) {
-        int txt = randTxt();
-        switch (txt) {
-            case 1:
-                System.out.println(nameAtk + " ÿğîñíî áğîñèëñÿ íà " + nameDef + "à");
-                break;
-            case 2:
-                System.out.println(nameAtk + " ïåğâûì íàñòèã " + nameDef + "à");
-                break;
-        }
-    }
-
-    static boolean Death(int hp, String nameAtk, String nameDef){
+    private boolean Death(int hp, String nameAtk, String nameDef){
         boolean death = false;
-        //åñëè çàùèòíèêà óáèëè
+        //ĞµÑĞ»Ğ¸ Ğ·Ğ°Ñ‰Ğ¸Ñ‚Ğ½Ğ¸ĞºĞ° ÑƒĞ±Ğ¸Ğ»Ğ¸
         if (hp <= 0) {
-            System.out.println();
             int txt = randTxt();
             switch (txt) {
                 case 1:
-                    System.out.println(nameAtk + " óáèë " + nameDef);
+                    setTxtComent(nameAtk + " ÑƒĞ±Ğ¸Ğ» " + nameDef);
                     break;
                 case 2:
-                    System.out.println(nameDef + " ïîãèá");
+                    setTxtComent(nameDef + " Ğ¿Ğ¾Ğ³Ğ¸Ğ±");
                     break;
             }
             death = true;
@@ -216,10 +173,30 @@ public class Fight {
         return death;
     }
 
-    static void TxtHP(String nameAtk, int hpAtk, String nameDef, int hpDef){
-        System.out.println(nameAtk + " - " +hpAtk+"  HP"); //âèâîä íà÷àëüíîãî ê-âà ÎÇ
-        System.out.println(nameDef + " - " +hpDef+"  HP"); //âèâîä íà÷àëüíîãî ê-âà ÎÇ;
+    //Ñ€Ğ°Ğ½Ğ´Ğ¾Ğ¼ Ñ‚ĞµĞºÑÑ‚Ğ°
+    public static int randTxt() {
+        Random random = new Random();
+        return random.nextInt(2) + 1;
+    }
+
+    //Ñ‚ĞµĞºÑÑ‚Ğ¾Ğ²ĞºĞ° Ğ¾ Ñ‚Ğ¾Ğ¼, ĞºÑ‚Ğ¾ Ğ¿ĞµÑ€Ğ²Ñ‹Ğ¹ Ğ½Ğ°Ğ¿Ğ°Ğ»
+    private void TxtFist(String nameAtk, String nameDef) {
+        int txt = randTxt();
+        switch (txt) {
+            case 1:
+                setTxtComent(nameAtk + " ÑÑ€Ğ¾ÑĞ½Ğ¾ Ğ±Ñ€Ğ¾ÑĞ¸Ğ»ÑÑ Ğ½Ğ° " + nameDef);
+                break;
+            case 2:
+                setTxtComent(nameAtk + " Ğ¿ĞµÑ€Ğ²Ñ‹Ğ¼ Ğ½Ğ°ÑÑ‚Ğ¸Ğ³ " + nameDef);
+                break;
+        }
+    }
+
+    public String getTxtComent() {
+        return txtComent;
+    }
+
+    public void setTxtComent(String txtComent) {
+        this.txtComent = txtComent;
     }
 }
-
-

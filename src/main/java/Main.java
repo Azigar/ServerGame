@@ -53,8 +53,8 @@ class ServeOneThread extends Thread {
 
         this.fight = new Fight();
 
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF8")); //в эту переменную будут поступать данные
-        this.out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true); //эта переменная на вывод данных клиенту
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8")); //в эту переменную будут поступать данные
+        this.out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8")), true); //эта переменная на вывод данных клиенту
         start();
     }
 
@@ -63,7 +63,7 @@ class ServeOneThread extends Thread {
             while (true) {
                 //ожидаю команду от клиента
                 cmd = in.readLine();  //запись в переменную полученые данные
-                System.out.println("Получил "+cmd);
+                //System.out.println("Получил "+cmd);
 
                 //закрываю поток
                 if (cmd.equalsIgnoreCase("END")) {
@@ -71,20 +71,20 @@ class ServeOneThread extends Thread {
                     break; //выход с потока
                 }
 
-                //клиент открыл активити боя, загружаю клиенту данные для стартового окна
+                /////////////клиент открыл активити боя, обработка запросов для боя
                 if (cmd.equalsIgnoreCase("FIGHT_ACTIVITY")){
-                    System.out.println("Формирю активити боя");
-
+                    /////////////////загружаю клиенту данные для стартового окна
                     //выбираю все данные о игроке
                     out.println("ID_PLAEYR"); //запрашиваю ID игрока
                     players.setId(Integer.parseInt(in.readLine())); //получаю ID игрока
-                    System.out.println("Фильтр для игрока" + players.getId());
+                    //System.out.println("Фильтр для игрока" + players.getId());
                     SelectAllFrom_Players(players.getId()); //выбираю все данные о игроке с БД
+                    System.out.println(players.getName() + " загружает бой");
 
                     //выбираю все данные о противнике
                     out.println("ID_ENEMY"); //запрашиваю ID противника
                     bots.setId(Integer.parseInt(in.readLine())); //получаю ID противника
-                    System.out.println("Фильтр для бота" + bots.getId());
+                    //System.out.println("Фильтр для бота" + bots.getId());
                     SelectAllFrom_Bots(bots.getId());  //выбираю все данные о противнике с БД
 
                     //передаю управление вопросами клиенту, что бы не сбится с очередности получение-отправка
@@ -98,17 +98,17 @@ class ServeOneThread extends Thread {
 
                     //отправка к-во ОЗ противника
                     cmd = in.readLine();  //запись в переменную полученые данные
-                    System.out.println("Получил "+cmd);
+                    //System.out.println("Получил "+cmd);
                     if (cmd.equalsIgnoreCase("HP_ENEMY")){
                         out.println(bots.getHp());
                     }
 
                     //определяю кто первый ходит, сравнивая интуицию опонентов
                     cmd = in.readLine();  //запись в переменную полученые данные
-                    System.out.println("Получил "+cmd);
+                    //System.out.println("Получил "+cmd);
                     if (cmd.equalsIgnoreCase("WHO_FIRST")){
                         boolean firstAtk = fight.Shans(players.getInst(), bots.getInst());
-                        System.out.println(firstAtk);
+                        //System.out.println(firstAtk);
                         if (firstAtk){
                             out.println("FIRST_PLAYER");
                         }else{
@@ -116,90 +116,121 @@ class ServeOneThread extends Thread {
                         }
                     }
 
-                    //вечный цикл для боя
-                    while (true){
-                        cmd = in.readLine();  //запись в переменную полученые данные
-                        System.out.println("Получил "+cmd);
-                        if (cmd.equalsIgnoreCase("ATK_1")){
+                    ////////////////////////////Система боя
+                    while (true) {
+                        /////////Ожидаю команду 1 (ожидаю направление удара/защиты, отмены боя, смерти опонентов)
+                        cmd = in.readLine();
+                        //System.out.println(cmd + " " + players.getHp());
+                        //клиент бьет в голову
+                        if (cmd.equalsIgnoreCase("ATK_1")) {
                             bots.setHp(fight.Fight(true, players.getName(), players.getStr() / 2, players.getStr(), players.getDex(), players.getInst(),
                                     false, bots.getName(), bots.getDex(), bots.getInst(), bots.getDef(), bots.getHp(), 1));
-                            System.out.println("ОЗ бота "+bots.getHp());
-                            if (bots.getHp()<=0) bots.setHp(0);
+                            //System.out.println("ОЗ бота "+bots.getHp());
+                            if (bots.getHp() <= 0) bots.setHp(0);
                             out.println(bots.getHp());
-                            System.out.println("Отправил "+bots.getHp());
+                            //System.out.println("Отправил "+bots.getHp());
                         }
 
-                        if (cmd.equalsIgnoreCase("ATK_2")){
+                        //клиент бьет в торс
+                        if (cmd.equalsIgnoreCase("ATK_2")) {
                             bots.setHp(fight.Fight(true, players.getName(), players.getStr() / 2, players.getStr(), players.getDex(), players.getInst(),
                                     false, bots.getName(), bots.getDex(), bots.getInst(), bots.getDef(), bots.getHp(), 2));
-                            System.out.println("ОЗ бота "+bots.getHp());
-                            if (bots.getHp()<=0) bots.setHp(0);
+                            //System.out.println("ОЗ бота "+bots.getHp());
+                            if (bots.getHp() <= 0) bots.setHp(0);
                             out.println(bots.getHp());
                         }
 
-                        if (cmd.equalsIgnoreCase("ATK_3")){
+                        //клиент бьет в ноги
+                        if (cmd.equalsIgnoreCase("ATK_3")) {
                             bots.setHp(fight.Fight(true, players.getName(), players.getStr() / 2, players.getStr(), players.getDex(), players.getInst(),
                                     false, bots.getName(), bots.getDex(), bots.getInst(), bots.getDef(), bots.getHp(), 3));
-                            System.out.println("ОЗ бота "+bots.getHp());
-                            if (bots.getHp()<=0) bots.setHp(0);
+                            //System.out.println("ОЗ бота "+bots.getHp());
+                            if (bots.getHp() <= 0) bots.setHp(0);
                             out.println(bots.getHp());
                         }
 
-                        if (cmd.equalsIgnoreCase("DEF_1")){
+                        //клиент защищает голову
+                        if (cmd.equalsIgnoreCase("DEF_1")) {
                             //метод расчета ОЗ игрока. Параметры: хар-ки бота, хар-ки игрока, направление удара 1 - голова
                             players.setHp(fight.Fight(false, bots.getName(), bots.getStr() / 2, bots.getStr(), bots.getDex(), bots.getInst(),
                                     true, players.getName(), players.getDex(), players.getInst(), players.getDef(), players.getHp(), 1));
-                            System.out.println("ОЗ игрока "+players.getHp());
-                            if (players.getHp()<=0) players.setHp(0);
+                            //System.out.println("ОЗ игрока "+players.getHp());
+                            if (players.getHp() <= 0) players.setHp(0);
                             out.println(players.getHp());
-                            System.out.println("Отправил "+players.getHp());
+                            //System.out.println("Отправил "+players.getHp());
                         }
 
-                        if (cmd.equalsIgnoreCase("DEF_2")){
+                        //клиент защищает торс
+                        if (cmd.equalsIgnoreCase("DEF_2")) {
                             //метод расчета ОЗ игрока. Параметры: хар-ки бота, хар-ки игрока, направление удара 1 - голова
                             players.setHp(fight.Fight(false, bots.getName(), bots.getStr() / 2, bots.getStr(), bots.getDex(), bots.getInst(),
                                     true, players.getName(), players.getDex(), players.getInst(), players.getDef(), players.getHp(), 2));
-                            System.out.println("ОЗ игрока "+players.getHp());
-                            if (players.getHp()<=0) players.setHp(0);
+                            //System.out.println("ОЗ игрока "+players.getHp());
+                            if (players.getHp() <= 0) players.setHp(0);
                             out.println(players.getHp());
                         }
 
-                        if (cmd.equalsIgnoreCase("DEF_3")){
+                        //клиент защищает ноги
+                        if (cmd.equalsIgnoreCase("DEF_3")) {
                             //метод расчета ОЗ игрока. Параметры: хар-ки бота, хар-ки игрока, направление удара 1 - голова
                             players.setHp(fight.Fight(false, bots.getName(), bots.getStr() / 2, bots.getStr(), bots.getDex(), bots.getInst(),
                                     true, players.getName(), players.getDex(), players.getInst(), players.getDef(), players.getHp(), 3));
-                            System.out.println("ОЗ игрока "+players.getHp());
-                            if (players.getHp()<=0) players.setHp(0);
+                            //System.out.println("ОЗ игрока "+players.getHp());
+                            if (players.getHp() <= 0) players.setHp(0);
                             out.println(players.getHp());
                         }
 
-                        //закрываю поток
-                        if (cmd.equalsIgnoreCase("END")) {
-                            out.println("END");
-                            break; //выход с потока
+                        //клиент погиб в бою
+                        if (cmd.equalsIgnoreCase("DIED") && players.getHp() <= 0) {
+                            out.println("DIED");  //отправляю клиенту, что надо закрыть потоки на конект
+                            break; //выход с цикла
                         }
 
+                        ///////////////////////////Завершение боя
+                        //клиент уходит с битвы
+                        if (cmd.equalsIgnoreCase("LEAVE")) {
+                              out.println("LEAVE");  //отправляю клиенту, что надо закрыть потоки на конект
+                            break; //выход с цикла
+                        }
+
+                        //клиент победил в бою
+                        if (cmd.equalsIgnoreCase("VICTORI") && bots.getHp() <= 0) {
+
+                            //out.println("DIED");  //отправляю клиенту, что надо закрыть потоки на конект
+                            break; //выход с цикла
+                        }
+
+                        /////////Ожидаю команду 2 (клиент хочет получить комент)
                         cmd = in.readLine();  //запись в переменную полученые данные
-                        System.out.println("Получил "+cmd);
+                        //System.out.println("Получил "+cmd);
                         if (cmd.equalsIgnoreCase("COMMENT_ATK") || cmd.equalsIgnoreCase("COMMENT_DEF")) {
                             out.println(fight.getTxtComent());
-                            System.out.println("Отправил "+fight.getTxtComent());
+                            //System.out.println("Отправил " + fight.getTxtComent());
                         }
-
-                        if(players.getHp() == 0){
-
-                            break;
-                        }
-
-                        if(bots.getHp() == 0){
-
-                            break;
-                        }
-
                     }
+
+                    //клиент уходит с битвы
+                    if(cmd.equalsIgnoreCase("LEAVE")){
+                        UpdateHpPlayer(players.getId());  //обновляю ОЗ игрока в БД
+                        System.out.println(players.getName() + " покинул бой");
+                        break;  //выход с цикла и потока
+                    }
+
+                    //клиент погиб в бою
+                    if(cmd.equalsIgnoreCase("DIED")){
+                        UpdateHpPlayer(players.getId());  //обновляю ОЗ игрока в БД
+                        System.out.println(players.getName() + " погиб в бою");
+                        break;  //выход с цикла и потока
+                    }
+
+                    if(bots.getHp() == 0){
+                        break;
+                    }
+
+
                 }
 
-                if (cmd.equalsIgnoreCase("HP_HERO")){
+                if (cmd.equalsIgnoreCase("LEAVE")){
                     //out.println(player.hp); //отправляю ОЗ игрока
                 }
 
@@ -218,7 +249,7 @@ class ServeOneThread extends Thread {
                 System.err.println("Соединение № "+ n +". Не получается разорвать связь с клиентом: " +HostName);
             }
         }
-        System.out.println("Завершено соединение № "+ n +", клиент: " +HostName+" отключен");
+        System.out.println("Завершено соединение № " + n + ", клиент: " +HostName + ", " + players.getName() + " отключен");
     }
 
     //выборка всех данных о игроке
@@ -254,6 +285,12 @@ class ServeOneThread extends Thread {
             bots.setHp(res.getInt("hp"));
             bots.setLive(res.getInt("live"));
         }
+    }
+
+    //выборка всех данных о противнике
+    void UpdateHpPlayer(int id) throws SQLException {
+        query = "UPDATE players set hp = " + players.getHp() + " WHERE id_players = " + id + ";"; //код SQL-запроса
+        statement.executeUpdate(query); //запускаю запрос
     }
 }
 

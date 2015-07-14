@@ -9,7 +9,7 @@ import java.sql.Statement;
  * Created by Azigar on 21.06.2015.
  */
 public class Statement_help {
-    ///Константы для подключение к БД
+    ///РљРѕРЅСЃС‚Р°РЅС‚С‹ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р‘Р”
     private static final String DB_NAME = "rpggame";
     private static final String URL = "jdbc:mysql://localhost:3306/"+DB_NAME;
     private static final String USER = "root";
@@ -20,46 +20,46 @@ public class Statement_help {
     public static void main(String[] args) {
 
         try {
-            Class.forName("com.mysql.jdbc.Driver"); //подключаю драйвер
+            Class.forName("com.mysql.jdbc.Driver"); //РїРѕРґРєР»СЋС‡Р°СЋ РґСЂР°Р№РІРµСЂ
         } catch (ClassNotFoundException e) {
-            System.err.println("Не удалось загрузить Driver, ошибка № " + e);
+            System.err.println("РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ Driver, РѕС€РёР±РєР° в„– " + e);
         }
 
         try {
-            Connection connection = DriverManager.getConnection(URL, USER, PASS); //конект с БД
+            Connection connection = DriverManager.getConnection(URL, USER, PASS); //РєРѕРЅРµРєС‚ СЃ Р‘Р”
             statement = connection.createStatement();
             if (!connection.isClosed()) {
-                System.out.println("Соединение с БД \"" + DB_NAME + "\" успешно установлено");
+                System.out.println("РЎРѕРµРґРёРЅРµРЅРёРµ СЃ Р‘Р” \"" + DB_NAME + "\" СѓСЃРїРµС€РЅРѕ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ");
             }
         } catch (SQLException e) {
-            System.err.println("Невозможно соединенится с БД \"" + DB_NAME + "\", ошибка № " + e);
+            System.err.println("РќРµРІРѕР·РјРѕР¶РЅРѕ СЃРѕРµРґРёРЅРµРЅРёС‚СЃСЏ СЃ Р‘Р” \"" + DB_NAME + "\", РѕС€РёР±РєР° в„– " + e);
         }
 
-        //создание SQL-запроса
+        //СЃРѕР·РґР°РЅРёРµ SQL-Р·Р°РїСЂРѕСЃР°
         try {
-            //добавление записи в таблицу
+            //РґРѕР±Р°РІР»РµРЅРёРµ Р·Р°РїРёСЃРё РІ С‚Р°Р±Р»РёС†Сѓ
             statement.execute("insert into players (name, data_begin, str, lvl, dex, inst, def, hp, max_hp)" +
-                   "values('Азигар', CURRENT_DATE, 10, 1, 10, 10,10,40, 40);");
-            System.out.println("SQL-запрос успешно обработан");
+                   "values('РђР·РёРіР°СЂ', CURRENT_DATE, 10, 1, 10, 10,10,40, 40);");
+            System.out.println("SQL-Р·Р°РїСЂРѕСЃ СѓСЃРїРµС€РЅРѕ РѕР±СЂР°Р±РѕС‚Р°РЅ");
 
             /*
-            //изменение записи
-            int res = statement.executeUpdate("UPDATE players set name = 'Пингвин' WHERE id_players = 4;");
-            System.out.println(String.valueOf(res)); // выводит к-во обработаных записей
-            System.out.println("SQL-запрос успешно обработан, обработаных записей - "+res);
+            //РёР·РјРµРЅРµРЅРёРµ Р·Р°РїРёСЃРё
+            int res = statement.executeUpdate("UPDATE players set name = 'РџРёРЅРіРІРёРЅ' WHERE id_players = 4;");
+            System.out.println(String.valueOf(res)); // РІС‹РІРѕРґРёС‚ Рє-РІРѕ РѕР±СЂР°Р±РѕС‚Р°РЅС‹С… Р·Р°РїРёСЃРµР№
+            System.out.println("SQL-Р·Р°РїСЂРѕСЃ СѓСЃРїРµС€РЅРѕ РѕР±СЂР°Р±РѕС‚Р°РЅ, РѕР±СЂР°Р±РѕС‚Р°РЅС‹С… Р·Р°РїРёСЃРµР№ - "+res);
             */
 
             /*
-            //выборка данных
-            String id = "2"; //фильтр для запроса
-            String query = "select * from user WHERE id = "+id; //код SQL-запроса
-            ResultSet res = statement.executeQuery(query);  //запускаю запрос
-            //в цикле прохожу всю таблицу и пишу данные в сеттеры
+            //РІС‹Р±РѕСЂРєР° РґР°РЅРЅС‹С…
+            String id = "2"; //С„РёР»СЊС‚СЂ РґР»СЏ Р·Р°РїСЂРѕСЃР°
+            String query = "select * from user WHERE id = "+id; //РєРѕРґ SQL-Р·Р°РїСЂРѕСЃР°
+            ResultSet res = statement.executeQuery(query);  //Р·Р°РїСѓСЃРєР°СЋ Р·Р°РїСЂРѕСЃ
+            //РІ С†РёРєР»Рµ РїСЂРѕС…РѕР¶Сѓ РІСЃСЋ С‚Р°Р±Р»РёС†Сѓ Рё РїРёС€Сѓ РґР°РЅРЅС‹Рµ РІ СЃРµС‚С‚РµСЂС‹
             while (res.next()){
-                Bots user = new Bots(); //подключаю класс Bots
-                user.setId(res.getInt(1));  //пишу в сеттер Bots результат с первого поля - 1
-                user.setUsername(res.getString(2)); //пишу в сеттер Bots результат со второго поля - 2
-                user.setPassword(res.getString("password")); //пишу в сеттер Bots результат со третьего поля - password (можно указывать номер поля или его название)
+                Bots user = new Bots(); //РїРѕРґРєР»СЋС‡Р°СЋ РєР»Р°СЃСЃ Bots
+                user.setId(res.getInt(1));  //РїРёС€Сѓ РІ СЃРµС‚С‚РµСЂ Bots СЂРµР·СѓР»СЊС‚Р°С‚ СЃ РїРµСЂРІРѕРіРѕ РїРѕР»СЏ - 1
+                user.setUsername(res.getString(2)); //РїРёС€Сѓ РІ СЃРµС‚С‚РµСЂ Bots СЂРµР·СѓР»СЊС‚Р°С‚ СЃРѕ РІС‚РѕСЂРѕРіРѕ РїРѕР»СЏ - 2
+                user.setPassword(res.getString("password")); //РїРёС€Сѓ РІ СЃРµС‚С‚РµСЂ Bots СЂРµР·СѓР»СЊС‚Р°С‚ СЃРѕ С‚СЂРµС‚СЊРµРіРѕ РїРѕР»СЏ - password (РјРѕР¶РЅРѕ СѓРєР°Р·С‹РІР°С‚СЊ РЅРѕРјРµСЂ РїРѕР»СЏ РёР»Рё РµРіРѕ РЅР°Р·РІР°РЅРёРµ)
 
                 System.out.println(user);
 
@@ -72,23 +72,23 @@ public class Statement_help {
             */
 
             /*
-            //Пакет запросов
+            //РџР°РєРµС‚ Р·Р°РїСЂРѕСЃРѕРІ
             statement.addBatch("insert into bots (name, str, lvl, dex, inst, def, hp)" +
-                         "values('Колорадский Жук', 10, 1, 10, 10,10,40);");
+                         "values('РљРѕР»РѕСЂР°РґСЃРєРёР№ Р–СѓРє', 10, 1, 10, 10,10,40);");
             statement.addBatch("insert into bots (name, str, lvl, dex, inst, def, hp)" +
-                    "values('Мышун', 10, 1, 10, 10,10,40);");
+                    "values('РњС‹С€СѓРЅ', 10, 1, 10, 10,10,40);");
             statement.addBatch("insert into bots (name, str, lvl, dex, inst, def, hp)" +
-                    "values('Крысак', 15, 2, 15, 15, 15, 50);");
+                    "values('РљСЂС‹СЃР°Рє', 15, 2, 15, 15, 15, 50);");
 
-            statement.executeBatch(); //выполнение всех запросов
-            System.out.println("Пакет SQL-запросо успешно обработан");
-            statement.clearBatch(); //очищает весь пакет запросов
+            statement.executeBatch(); //РІС‹РїРѕР»РЅРµРЅРёРµ РІСЃРµС… Р·Р°РїСЂРѕСЃРѕРІ
+            System.out.println("РџР°РєРµС‚ SQL-Р·Р°РїСЂРѕСЃРѕ СѓСЃРїРµС€РЅРѕ РѕР±СЂР°Р±РѕС‚Р°РЅ");
+            statement.clearBatch(); //РѕС‡РёС‰Р°РµС‚ РІРµСЃСЊ РїР°РєРµС‚ Р·Р°РїСЂРѕСЃРѕРІ
             */
 
 
 
         } catch (SQLException e) {
-            System.err.println("Невозможно обработать SQL-запрос, ошибка № " + e);
+            System.err.println("РќРµРІРѕР·РјРѕР¶РЅРѕ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ SQL-Р·Р°РїСЂРѕСЃ, РѕС€РёР±РєР° в„– " + e);
         }
     }
 }

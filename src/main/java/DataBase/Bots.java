@@ -13,7 +13,12 @@ public class Bots {
     private int inst;
     private int def;
     private int hp;
-    private int live;
+    private int mana;
+    private int isLive;
+    private int exp;
+    private int pvp_exp;
+    private int money_min;
+    private int money_max;
 
     ///метод для коректного вывода на экран обьекта
     @Override
@@ -90,11 +95,51 @@ public class Bots {
         this.hp = hp;
     }
 
-    public int getLive() {
-        return live;
+    public int getExp() {
+        return exp;
     }
 
-    public void setLive(int live) {
-        this.live = live;
+    public void setExp(int exp) {
+        this.exp = exp;
+    }
+
+    public int getMoney_min() {
+        return money_min;
+    }
+
+    public void setMoney_min(int money_min) {
+        this.money_min = money_min;
+    }
+
+    public int getMoney_max() {
+        return money_max;
+    }
+
+    public void setMoney_max(int money_max) {
+        this.money_max = money_max;
+    }
+
+    public int getIsLive() {
+        return isLive;
+    }
+
+    public void setIsLive(int isLive) {
+        this.isLive = isLive;
+    }
+
+    public int getMana() {
+        return mana;
+    }
+
+    public void setMana(int mana) {
+        this.mana = mana;
+    }
+
+    public int getPvp_exp() {
+        return pvp_exp;
+    }
+
+    public void setPvp_exp(int pvp_exp) {
+        this.pvp_exp = pvp_exp;
     }
 }

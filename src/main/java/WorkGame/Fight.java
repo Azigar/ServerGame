@@ -12,30 +12,24 @@ public class Fight {
 
     private String txtUdar;
     private String txtComent;
+    private int koef_dex = 15; //коефициент для шанса уворота
+    private int koef_inst = 35; //коефициент для шанса крита
 
     //метод боя и возврат значение ОЗ противника
     public int Fight(boolean liveAtk, String nameAtk, int minUronAtk, int maxUronAtk, double dexAtk, double instAtk,
                             boolean liveDef, String nameDef, double dexDef, double instDef, int defDef, int hpDef, int nap){
         int uron=0;
-        //если попал в противника
-        if (ShansBlok(liveAtk, liveDef, nameAtk, nameDef, nap) == true) {
-            //и не попал в блок
-            if (Shans(dexAtk, dexDef) == false) {
-                //и нанес крит урон
-                if (Shans(instAtk, instDef) == true) {
-                    //расчет силы КРИТИЧЕСОГО Урона
-                    uron = SrtKritUron(minUronAtk, maxUronAtk, defDef, nameAtk);
+        if (Shans(dexAtk, dexDef, koef_dex) == false) {  //если попал в противника
+            if (ShansBlok(liveAtk, liveDef, nameAtk, nameDef, nap) == true) {  //и не попал в блок
+                if (Shans(instAtk, instDef, koef_inst) == true) {  //и нанес крит урон
+                    uron = SrtKritUron(minUronAtk, maxUronAtk, defDef, nameAtk);  //расчет силы КРИТИЧЕСОГО Урона
                 } else { //нанес обычный удар
-                    //расчет силы урона
-                    uron = SrtUron(minUronAtk, maxUronAtk, defDef, nameAtk);
+                    uron = SrtUron(minUronAtk, maxUronAtk, defDef, nameAtk);  //расчет силы урона
                 }
-                //попал в блок
-            } else {
-                //и нанес крит урон  (пробил блок)
-                if (Shans(instAtk, instDef) == true) {
-                    //расчет силы урона
-                    uron = SrtUronBlok(minUronAtk, maxUronAtk, defDef, nameAtk);
-                } else {
+            } else { //попал в блок
+                if (Shans(instAtk, instDef, koef_inst) == true) {  //но нанес крит урон - пробил блок
+                    uron = SrtUronBlok(minUronAtk, maxUronAtk, defDef, nameAtk);  //расчет силы урона
+                } else {  //обычным ударом
                     int txt = randTxt();
                     switch (txt) {
                         case 1:
@@ -47,8 +41,7 @@ public class Fight {
                     }
                 }
             }
-            //промазал
-        } else {
+        } else {  //промазал
             int txt = randTxt();
             switch (txt) {
                 case 1:
@@ -59,27 +52,19 @@ public class Fight {
                     break;
             }
         }
-        //уменшаем к-во ОЗ противника
-        hpDef = hpDef - uron;
+        hpDef = hpDef - uron;  //уменшаем к-во ОЗ противника
         return hpDef;
     }
 
-    //расчет шанса
-    public static boolean Shans(double statAtk, double statDef) {
-        //первоначально шанс-лож
-        boolean i = false;
-        //расчет шанса 20+(стат+лвл)-(стат+лвл)
-        double shans = (50 + (statAtk - statDef)) / 100;
-        //всегда есть антишанс
-        if (shans >= 0.87) shans = 0.87;
-        if (shans <= 0.13) shans = 0.13;
-        String str = Double.toString(shans); //перевод double в String
-        //генератор случаных чисел от 0,1 до 1
-        double random = Math.random();
-        //если раном удолетворительный, тогда шасн-правда
-        if (random <= shans) i = true;
-        //возвращаю значение
-        return i;
+    //расчет
+    public static boolean Shans(double statAtk, double statDef, int koef) {
+        boolean chance = false;  //первоначально шанс-лож
+        double shans = (koef + (statAtk - statDef)) / 100;  //расчет шанса (коеф+(стат+лвл)-(стат+лвл)) /100
+        if (shans >= 0.87) shans = 0.87;  //всегда есть антишанс
+        if (shans <= 0.13) shans = 0.13;  //всегда есть шанс
+        double random = Math.random();  //генератор случаных чисел от 0,1 до 1
+        if (random <= shans) { chance = true; } //если раном удолетворительный, тогда шасн-правда
+        return chance;  //возвращаю значение
     }
 
     //расчет силы урона

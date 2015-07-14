@@ -16,21 +16,117 @@
       <column name="inst" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="def" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <column name="live" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="mana" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="isLive" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="money_min" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="money_max" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pvp_exp" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="pvp_lvl" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="id_bots"/>
     </table>
+    <table name="drops" schema="" catalog="rpggame" type="TABLE">
+      <column name="id_bots" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="id_Objects" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="chance" sqlType="DOUBLE" precision="22" scale="0" nullable="false" jdbcType="8"/>
+    </table>
+    <table name="execution" schema="" catalog="rpggame" type="TABLE">
+      <column name="id_execution" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="id_players" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="id_quests" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="id_execution"/>
+    </table>
+    <table name="exp" schema="" catalog="rpggame" type="TABLE">
+      <column name="lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="min_exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="max_exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="exp_money" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="lvl"/>
+    </table>
+    <table name="inventory" schema="" catalog="rpggame" type="TABLE">
+      <column name="id_players" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="id_Objects" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="kol" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+    </table>
+    <table name="objects" schema="" catalog="rpggame" type="TABLE">
+      <column name="id_Objects" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="name" sqlType="VARCHAR" precision="45" scale="0" nullable="false" jdbcType="12"/>
+      <column name="lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="str" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="dex" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="inst" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="def" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="hp" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="torso" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="shorts" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="left_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="right_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="belt" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="feet" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="hands" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="wrist" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="head" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="lvl_object" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="prise" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="isStakan" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="isQuest" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="id_quests" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="CountForQuest" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="id_Objects"/>
+    </table>
     <table name="players" schema="" catalog="rpggame" type="TABLE">
-      <column name="id_players" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="id_players" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12" def="Jyc="/>
       <column name="name" sqlType="VARCHAR" precision="45" scale="0" nullable="false" jdbcType="12"/>
       <column name="data_begin" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
       <column name="lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="vip_lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="vip_exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pvp_lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pvp_exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="str" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="dex" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="inst" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="def" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="max_hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="mana" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="money" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="gold" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="torso" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="left_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="shorts" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="right_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="belt" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="feet" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="hands" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="wrist" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="head" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="id_bots" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="max_mana" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="id_players"/>
+    </table>
+    <table name="pvp_exp" schema="" catalog="rpggame" type="TABLE">
+      <column name="pvp_lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pvp_name" sqlType="VARCHAR" precision="45" scale="0" nullable="false" jdbcType="12"/>
+      <column name="min_pvp_exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="max_pvp_exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pvp_money" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="pvp_lvl"/>
+    </table>
+    <table name="quests" schema="" catalog="rpggame" type="TABLE">
+      <column name="id_quests" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="name" sqlType="VARCHAR" precision="45" scale="0" nullable="false" jdbcType="12"/>
+      <primary-key name="PRIMARY" columns="id_quests"/>
+    </table>
+    <table name="vip_exp" schema="" catalog="rpggame" type="TABLE">
+      <column name="vip_lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="min_vip_exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="max_vip_exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="size_inventory" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="vip_money" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="vip_hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="vip_lvl"/>
     </table>
   </data-source>
 </component>

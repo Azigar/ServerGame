@@ -14,29 +14,38 @@ public class Fight {
     private String txtComent;
     private int koef_dex = 15; //коефициент для шанса уворота
     private int koef_inst = 35; //коефициент для шанса крита
+    private int uron;
+    private static String s1Atk, s2Atk, s3Atk;
+    private static String s1Def, s2Def, s3Def;
 
     //метод боя и возврат значение ОЗ противника
-    public int Fight(boolean liveAtk, String nameAtk, int minUronAtk, int maxUronAtk, double dexAtk, double instAtk,
-                            boolean liveDef, String nameDef, double dexDef, double instDef, int defDef, int hpDef, int nap){
-        int uron=0;
+    public int Fight(boolean liveAtk, String nameAtk, int strAtk, double dexAtk, double instAtk, boolean liveDef, String nameDef,
+                     double dexDef, double instDef, int defDef, int hpDef, int nap, int sexAtk, int sexDef){
+        SEX(sexAtk, sexDef); //мальчик-девочка
+        setUron(0); //обнуляю урон
+        int minUronAtk = strAtk / 3, maxUronAtk = strAtk + (strAtk / 3);
         if (Shans(dexAtk, dexDef, koef_dex) == false) {  //если попал в противника
             if (ShansBlok(liveAtk, liveDef, nameAtk, nameDef, nap) == true) {  //и не попал в блок
                 if (Shans(instAtk, instDef, koef_inst) == true) {  //и нанес крит урон
-                    uron = SrtKritUron(minUronAtk, maxUronAtk, defDef, nameAtk);  //расчет силы КРИТИЧЕСОГО Урона
+                    setUron(SrtKritUron(minUronAtk, maxUronAtk, defDef, nameAtk)); //расчет силы КРИТИЧЕСОГО Урона
                 } else { //нанес обычный удар
-                    uron = SrtUron(minUronAtk, maxUronAtk, defDef, nameAtk);  //расчет силы урона
+                    setUron(SrtUron(minUronAtk, maxUronAtk, defDef, nameAtk));  //расчет силы урона
                 }
             } else { //попал в блок
                 if (Shans(instAtk, instDef, koef_inst) == true) {  //но нанес крит урон - пробил блок
-                    uron = SrtUronBlok(minUronAtk, maxUronAtk, defDef, nameAtk);  //расчет силы урона
+                    setUron(SrtUronBlok(minUronAtk, maxUronAtk, defDef, nameAtk));  //расчет силы урона
                 } else {  //обычным ударом
                     int txt = randTxt();
                     switch (txt) {
                         case 1:
-                            setTxtComent(nameDef + " удачно блокировал удар");
+                            if (sexDef == 1)
+                            setTxtComent(nameDef + " удачно блокировал" + s1Def + " удар");
                             break;
                         case 2:
-                            setTxtComent(nameDef + " умело парировал удар");
+                            setTxtComent(nameDef + " умело парировал" + s1Def + " удар");
+                            break;
+                        case 3:
+                            setTxtComent(nameAtk + " попал" + s1Atk + " в блок");
                             break;
                     }
                 }
@@ -45,15 +54,42 @@ public class Fight {
             int txt = randTxt();
             switch (txt) {
                 case 1:
-                    setTxtComent(nameAtk + " промазал");
+                    setTxtComent(nameAtk + " промазал" + s1Atk);
                     break;
                 case 2:
-                    setTxtComent(nameDef + " уклонился от удара");
+                    setTxtComent(nameDef + " уклонил" + s1Def + "с" + s2Def + " от удара");
+                    break;
+                case 3:
+                    setTxtComent(nameDef + " ловко увернул" + s1Def + "с" + s2Def);
                     break;
             }
         }
-        hpDef = hpDef - uron;  //уменшаем к-во ОЗ противника
+        hpDef = hpDef - getUron();  //уменшаем к-во ОЗ противника
         return hpDef;
+    }
+
+    //мальчик-девочка
+    private static void SEX(int sex1, int sex2) {
+        if (sex1 == 1){
+            s1Atk = "";
+            s2Atk = "я";
+            s3Atk = "";
+        }
+        else {
+            s1Atk = "а";
+            s2Atk = "ь";
+            s3Atk = "ла";
+        }
+        if (sex2 == 1){
+            s1Def = "";
+            s2Def = "я";
+            s3Def = "";
+        }
+        else {
+            s1Def = "а";
+            s2Def = "ь";
+            s3Def = "ла";
+        }
     }
 
     //расчет
@@ -114,7 +150,7 @@ public class Fight {
     //расчет силы КРИТИЧЕСОГО Урона
     private int SrtKritUron(int srtMin, int srtMax, int def, String name) {
         int srtKritUron = (Str(srtMin, srtMax) * 2) - (def / 10);
-        setTxtComent(name + " нанес КРИТИЧЕСКИЙ удар" + txtUdar + " (урон " + srtKritUron + ")");
+        setTxtComent(name + " нанес" + s3Atk + " КРИТИЧЕСКИЙ удар" + txtUdar + " (урон " + srtKritUron + ")");
         return srtKritUron;
     }
 
@@ -123,9 +159,9 @@ public class Fight {
         int srtUron = Str(srtMin, srtMax) - (def / 10);
         int ave = (srtMin + srtMax) / 2;
         if (srtUron <= ave)
-            setTxtComent(name + " нанес незначительный удар" + txtUdar + " (урон " + srtUron + ")");
+            setTxtComent(name + " нанес" + s3Atk + " незначительный удар" + txtUdar + " (урон " + srtUron + ")");
         else
-            setTxtComent(name + " нанес серьезный удар" + txtUdar + " (урон " + srtUron + ")");
+            setTxtComent(name + " нанес" + s3Atk + " серьезный удар" + txtUdar + " (урон " + srtUron + ")");
         return srtUron;
     }
 
@@ -134,47 +170,16 @@ public class Fight {
         int srtUronBlok = Str(srtMin, srtMax) - (def / 10);
         int ave = (srtMin + srtMax) / 2;
         if (srtUronBlok <= ave)
-            setTxtComent(name + " пробил блок и нанес незначительный удар" + txtUdar + " (урон " + srtUronBlok + ")");
+            setTxtComent(name + " пробил" + s1Atk + " блок и нанес" + s3Atk + " незначительный удар" + txtUdar + " (урон " + srtUronBlok + ")");
         else
-            setTxtComent(name + " пробив блок противника, нанес серьезный удар" + txtUdar + " (урон " + srtUronBlok + ")");
+            setTxtComent(name + " пробив блок, нанес" + s3Atk + " серьезный удар" + txtUdar + " (урон " + srtUronBlok + ")");
         return srtUronBlok;
-    }
-
-    private boolean Death(int hp, String nameAtk, String nameDef){
-        boolean death = false;
-        //если защитника убили
-        if (hp <= 0) {
-            int txt = randTxt();
-            switch (txt) {
-                case 1:
-                    setTxtComent(nameAtk + " убил " + nameDef);
-                    break;
-                case 2:
-                    setTxtComent(nameDef + " погиб");
-                    break;
-            }
-            death = true;
-        }
-        return death;
     }
 
     //рандом текста
     public static int randTxt() {
         Random random = new Random();
-        return random.nextInt(2) + 1;
-    }
-
-    //текстовка о том, кто первый напал
-    private void TxtFist(String nameAtk, String nameDef) {
-        int txt = randTxt();
-        switch (txt) {
-            case 1:
-                setTxtComent(nameAtk + " яросно бросился на " + nameDef);
-                break;
-            case 2:
-                setTxtComent(nameAtk + " первым настиг " + nameDef);
-                break;
-        }
+        return random.nextInt(3) + 1;
     }
 
     public String getTxtComent() {
@@ -183,5 +188,13 @@ public class Fight {
 
     public void setTxtComent(String txtComent) {
         this.txtComent = txtComent;
+    }
+
+    public int getUron() {
+        return uron;
+    }
+
+    public void setUron(int uron) {
+        this.uron = uron;
     }
 }

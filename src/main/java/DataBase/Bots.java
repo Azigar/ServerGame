@@ -19,6 +19,8 @@ public class Bots {
     private int pvp_exp;
     private int money_min;
     private int money_max;
+    private int sex;
+
 
     ///метод для коректного вывода на экран обьекта
     @Override
@@ -141,5 +143,13 @@ public class Bots {
 
     public void setPvp_exp(int pvp_exp) {
         this.pvp_exp = pvp_exp;
+    }
+
+    public int getSex() {
+        return sex;
+    }
+
+    public void setSex(int sex) {
+        this.sex = sex;
     }
 }

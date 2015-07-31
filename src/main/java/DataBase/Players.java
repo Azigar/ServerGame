@@ -1,6 +1,6 @@
 package DataBase;
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * Created by Azigar on 22.06.2015.
@@ -21,7 +21,7 @@ public class Players {
     private int max_mana;
     private int size_inventory;
     private int money;
-    private int gold;
+    private double gold;
     private int pvp_exp;
     private int pvp_lvl;
     private int min_pvp_exp;
@@ -31,15 +31,38 @@ public class Players {
     private int exp_money;
     private int vip_money;
     private int pvp_money;
-    private int vip_hp;
     private int id_bots;
     private String pvp_name;
+    private Date lastDate;
+    private Date dDateBirth;
+    private String sDateBirth;
+    private int sex;
+    private String avatar;
+    private int days;
+    private int maxMyUron;
+    private int maxEnemyUron;
+    private int pve_v;
+    private int pve_l;
+    private int pvp_v;
+    private int pvp_l;
+    private int holiday;
+    private int birthday;
+    private String pass;
+    private int isPass;
 
 
 
     //геттеры и сеттеры
     public String getName() {
         return name;
+    }
+
+    public int getIsPass() {
+        return isPass;
+    }
+
+    public void setIsPass(int isPass) {
+        this.isPass = isPass;
     }
 
     public void setName(String name) {
@@ -198,14 +221,6 @@ public class Players {
         this.max_pvp_exp = max_pvp_exp;
     }
 
-    public int getVip_hp() {
-        return vip_hp;
-    }
-
-    public void setVip_hp(int vip_hp) {
-        this.vip_hp = vip_hp;
-    }
-
     public int getVip_lvl() {
         return vip_lvl;
     }
@@ -238,11 +253,11 @@ public class Players {
         this.pvp_name = pvp_name;
     }
 
-    public int getGold() {
+    public double getGold() {
         return gold;
     }
 
-    public void setGold(int gold) {
+    public void setGold(double gold) {
         this.gold = gold;
     }
 
@@ -252,5 +267,125 @@ public class Players {
 
     public void setMax_mana(int max_mana) {
         this.max_mana = max_mana;
+    }
+
+    public Date getLastDate() {
+        return lastDate;
+    }
+
+    public void setLastDate(Date lastDate) {
+        this.lastDate = lastDate;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public void setDays(int days) {
+        this.days = days;
+    }
+
+    public int getMaxMyUron() {
+        return maxMyUron;
+    }
+
+    public void setMaxMyUron(int maxMyUron) {
+        this.maxMyUron = maxMyUron;
+    }
+
+    public int getMaxEnemyUron() {
+        return maxEnemyUron;
+    }
+
+    public void setMaxEnemyUron(int maxEnemyUron) {
+        this.maxEnemyUron = maxEnemyUron;
+    }
+
+    public int getPve_v() {
+        return pve_v;
+    }
+
+    public void setPve_v(int pve_v) {
+        this.pve_v = pve_v;
+    }
+
+    public int getPve_l() {
+        return pve_l;
+    }
+
+    public void setPve_l(int pve_l) {
+        this.pve_l = pve_l;
+    }
+
+    public int getPvp_v() {
+        return pvp_v;
+    }
+
+    public void setPvp_v(int pvp_v) {
+        this.pvp_v = pvp_v;
+    }
+
+    public int getPvp_l() {
+        return pvp_l;
+    }
+
+    public void setPvp_l(int pvp_l) {
+        this.pvp_l = pvp_l;
+    }
+
+    public String getsDateBirth() {
+        return sDateBirth;
+    }
+
+    public void setsDateBirth(String sDateBirth) {
+        this.sDateBirth = sDateBirth;
+    }
+
+    public Date getdDateBirth() {
+        return dDateBirth;
+    }
+
+    public void setdDateBirth(Date dDateBirth) {
+        this.dDateBirth = dDateBirth;
+    }
+
+    public int getSex() {
+        return sex;
+    }
+
+    public void setSex(int sex) {
+        this.sex = sex;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public int getHoliday() {
+        return holiday;
+    }
+
+    public void setHoliday(int holiday) {
+        this.holiday = holiday;
+    }
+
+    public int getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(int birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
     }
 }

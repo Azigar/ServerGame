@@ -23,7 +23,13 @@
       <column name="money_max" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="pvp_exp" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="pvp_lvl" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="sex" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="id_bots"/>
+    </table>
+    <table name="bounty" schema="" catalog="rpggame" type="TABLE">
+      <column name="days" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="money" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="gold" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
     </table>
     <table name="drops" schema="" catalog="rpggame" type="TABLE">
       <column name="id_bots" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
@@ -77,7 +83,7 @@
     <table name="players" schema="" catalog="rpggame" type="TABLE">
       <column name="id_players" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12" def="Jyc="/>
       <column name="name" sqlType="VARCHAR" precision="45" scale="0" nullable="false" jdbcType="12"/>
-      <column name="data_begin" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
+      <column name="DateBegin" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
       <column name="lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="vip_lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
@@ -91,8 +97,9 @@
       <column name="hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="max_hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="mana" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="max_mana" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="money" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <column name="gold" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="gold" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
       <column name="torso" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="left_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="shorts" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
@@ -103,8 +110,24 @@
       <column name="wrist" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="head" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="id_bots" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <column name="max_mana" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <primary-key name="PRIMARY" columns="id_players"/>
+      <column name="LastDate" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
+      <column name="days" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="maxMyUron" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="maxEnemyUron" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pve_v" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pve_l" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pvp_v" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pvp_l" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="DateBirth" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
+      <column name="sex" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="BountyGold" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
+      <column name="LoseGold" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
+      <column name="avatar" sqlType="VARCHAR" precision="8" scale="0" nullable="false" jdbcType="12"/>
+      <column name="isHoliday" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="isBirthday" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="pass" sqlType="VARCHAR" precision="15" scale="0" nullable="true" jdbcType="12"/>
+      <column name="isPass" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="name"/>
     </table>
     <table name="pvp_exp" schema="" catalog="rpggame" type="TABLE">
       <column name="pvp_lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
@@ -125,7 +148,6 @@
       <column name="max_vip_exp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="size_inventory" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="vip_money" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <column name="vip_hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="vip_lvl"/>
     </table>
   </data-source>

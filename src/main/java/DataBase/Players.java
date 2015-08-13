@@ -34,6 +34,7 @@ public class Players {
     private int id_bots;
     private String pvp_name;
     private Date lastDate;
+    private Date DateBegin;
     private Date dDateBirth;
     private String sDateBirth;
     private int sex;
@@ -49,6 +50,18 @@ public class Players {
     private int birthday;
     private String pass;
     private int isPass;
+    private int helmet;
+    private int right_hand;
+    private int left_hand;
+    private int armor;
+    private int boots;
+    private int gloves;
+    private int amulet;
+    private int right_ring;
+    private int left_ring;
+    private int freeInventar;
+
+
 
 
 
@@ -387,5 +400,93 @@ public class Players {
 
     public void setPass(String pass) {
         this.pass = pass;
+    }
+
+    public Date getDateBegin() {
+        return DateBegin;
+    }
+
+    public void setDateBegin(Date dateBegin) {
+        DateBegin = dateBegin;
+    }
+
+    public int getHelmet() {
+        return helmet;
+    }
+
+    public void setHelmet(int helmet) {
+        this.helmet = helmet;
+    }
+
+    public int getRight_hand() {
+        return right_hand;
+    }
+
+    public void setRight_hand(int right_hand) {
+        this.right_hand = right_hand;
+    }
+
+    public int getLeft_hand() {
+        return left_hand;
+    }
+
+    public void setLeft_hand(int left_hand) {
+        this.left_hand = left_hand;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
+
+    public void setArmor(int armor) {
+        this.armor = armor;
+    }
+
+    public int getBoots() {
+        return boots;
+    }
+
+    public void setBoots(int boots) {
+        this.boots = boots;
+    }
+
+    public int getGloves() {
+        return gloves;
+    }
+
+    public void setGloves(int gloves) {
+        this.gloves = gloves;
+    }
+
+    public int getAmulet() {
+        return amulet;
+    }
+
+    public void setAmulet(int amulet) {
+        this.amulet = amulet;
+    }
+
+    public int getRight_ring() {
+        return right_ring;
+    }
+
+    public void setRight_ring(int right_ring) {
+        this.right_ring = right_ring;
+    }
+
+    public int getLeft_ring() {
+        return left_ring;
+    }
+
+    public void setLeft_ring(int left_ring) {
+        this.left_ring = left_ring;
+    }
+
+    public int getFreeInventar() {
+        return freeInventar;
+    }
+
+    public void setFreeInventar(int freeInventar) {
+        this.freeInventar = freeInventar;
     }
 }

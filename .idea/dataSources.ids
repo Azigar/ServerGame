@@ -39,7 +39,7 @@
     <table name="execution" schema="" catalog="rpggame" type="TABLE">
       <column name="id_execution" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
       <column name="id_players" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
-      <column name="id_quests" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="id_quests" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="id_execution"/>
     </table>
     <table name="exp" schema="" catalog="rpggame" type="TABLE">
@@ -50,34 +50,38 @@
       <primary-key name="PRIMARY" columns="lvl"/>
     </table>
     <table name="inventory" schema="" catalog="rpggame" type="TABLE">
+      <column name="id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
       <column name="id_players" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
-      <column name="id_Objects" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="id_Objects" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="kol" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="id"/>
     </table>
     <table name="objects" schema="" catalog="rpggame" type="TABLE">
-      <column name="id_Objects" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="id_Objects" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="name" sqlType="VARCHAR" precision="45" scale="0" nullable="false" jdbcType="12"/>
       <column name="lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <column name="str" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="dex" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="inst" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="def" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="hp" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="torso" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="shorts" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="left_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="right_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="belt" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="feet" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="hands" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="wrist" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="head" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="lvl_object" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="prise" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <column name="isStakan" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="isQuest" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="id_quests" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="CountForQuest" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="str" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="dex" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="def" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="hp" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="inst" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="mana" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="helmet" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="left_hand" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="right_hand" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="armor" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="boots" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="gloves" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="amulet" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="right_ring" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="left_ring" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="isStakan" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="isQuest" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="id_quests" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="isTwoHanded" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="isWear" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="CountForQuest" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="id_Objects"/>
     </table>
     <table name="players" schema="" catalog="rpggame" type="TABLE">
@@ -100,15 +104,15 @@
       <column name="max_mana" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="money" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="gold" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
-      <column name="torso" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="left_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="shorts" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="helmet" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="right_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="belt" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="feet" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="hands" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="wrist" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="head" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="left_hand" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="armor" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="boots" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="gloves" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="amulet" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="right_ring" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="left_ring" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="id_bots" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="LastDate" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
       <column name="days" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
@@ -125,9 +129,9 @@
       <column name="avatar" sqlType="VARCHAR" precision="8" scale="0" nullable="false" jdbcType="12"/>
       <column name="isHoliday" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="isBirthday" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <column name="pass" sqlType="VARCHAR" precision="15" scale="0" nullable="true" jdbcType="12"/>
+      <column name="pass" sqlType="VARCHAR" precision="15" scale="0" nullable="false" jdbcType="12"/>
       <column name="isPass" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <primary-key name="PRIMARY" columns="name"/>
+      <primary-key name="PRIMARY" columns="id_players"/>
     </table>
     <table name="pvp_exp" schema="" catalog="rpggame" type="TABLE">
       <column name="pvp_lvl" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>

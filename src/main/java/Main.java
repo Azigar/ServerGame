@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 
 class ServeOneThread extends Thread {
@@ -40,10 +41,12 @@ class ServeOneThread extends Thread {
     Bots bots;
     Players players;
     Bounty bounty;
+    Objects objects;
 
     //массивы
-    String [] nameDrop, name, pvp_name, avatar;
+    String [] nameDrop, name, pvp_name, avatar, objInfo;
     int [] lvl, vip_lvl, str, dex, inst, def, hp, mana, pvp_exp, maxMyUron, maxEnemyUron, pve_v, pve_l, pvp_v, pvp_l, id_bots, sex;
+    int [][] arrayObjects;
 
     Fight fight; //для обработки боя
     final int PVP_EXP = 24;
@@ -63,6 +66,8 @@ class ServeOneThread extends Thread {
         this.connectBD = connBD;  //эта переменная получает по параметру управление подключением к БД
         this.statement = (Statement) connectBD.getConnection().createStatement();  //подключаю Statement
         this.players = new Players();  //подключаю екземпляр класса Игроки
+        this.objects = new Objects();
+        //objects = new ArrayList<Integer>();  //динамический массив для хранения вещей в рюкзаке героя
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8")); //в эту переменную будут поступать данные
         this.out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8")), true); //эта переменная на вывод данных клиенту
         start();
@@ -76,13 +81,13 @@ class ServeOneThread extends Thread {
             if (cmd.equalsIgnoreCase("ENTER")) {
                 while (true) {
                     //клиент покидает игру
-                    if (cmd.equalsIgnoreCase("END") ||  cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                    if (cmd.equalsIgnoreCase("END") ||  cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null) || cmd.equalsIgnoreCase("ERROR")) {
                         out.println("END");
                         break; //выход с цикла и потока
                     }
                     out.println("ID_PLAEYR"); //запрашиваю ID игрока
                     cmd = in.readLine();  //запись в переменную полученые данные
-                    if (cmd.equalsIgnoreCase("END") ||  cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                    if (cmd.equalsIgnoreCase("END") ||  cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null) || cmd.equalsIgnoreCase("ERROR")) {
                         break; //выход с цикла и потока
                     } else {
                         players.setId(cmd); //получаю ID игрока
@@ -94,6 +99,9 @@ class ServeOneThread extends Thread {
                             if (cmd.equalsIgnoreCase("END")) {
                                 break; //выход с цикла
                             }
+                            if (cmd.equalsIgnoreCase("INVENTAR")) {
+                                out.println("OK_OK");  //передаю вопросы клиенту
+                            }
 
                             cmd = in.readLine();  //слушаю команды
 
@@ -103,10 +111,402 @@ class ServeOneThread extends Thread {
                                 break; //выход с цикла
                             }
 
+                            //клиент запускает Инвентарь
+                            if (cmd.equalsIgnoreCase("INVENTAR")) {  //клиент покидает игру
+                                String res = FreeInventar(); //выбираю свободное место
+                                if(res.equalsIgnoreCase("ERROR")) out.println(res);
+                                else {
+                                    out.println("OK_INVENTAR");  //передаю вопросы клиенту
+                                    while (true) { //слушаю команды
+                                        if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                            break; //выход с цикла и потока
+                                        }
+                                        if (cmd.equalsIgnoreCase("GET_INVENTAR")) {
+                                            out.println("OK_OK_OK");  //передаю вопросы клиенту
+                                        }
+
+                                        cmd = in.readLine();  //слушаю команды
+
+                                        System.out.println("Получил 1 - " + cmd);
+
+                                        if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                            break; //выход с цикла и потока
+                                        }
+                                        //клиент хочет вещи которые одеты на герое
+                                        if (cmd.equalsIgnoreCase("GET_OBJ_HERO")) {  //запрашивает вещи, одетые на герое
+                                            SelectAllFromPlayers();
+                                            out.println("OK_GET_OBJ_HERO");  //передаю вопросы клиенту
+                                            while (true) { //слушаю команды
+                                                if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                                    break; //выход с цикла и потока
+                                                }
+
+                                                cmd = in.readLine();  //запись в переменную полученые данные
+
+                                                //клиент покидает игру
+                                                if (cmd.equalsIgnoreCase("END") ||
+                                                        cmd.equalsIgnoreCase("null") ||
+                                                        cmd.equalsIgnoreCase(null) ||
+                                                        cmd.equalsIgnoreCase("GET_INVENTAR")) {
+                                                    break; //выход с цикла и потока
+                                                }
+                                                if (cmd.equalsIgnoreCase("HELMET")) {
+                                                    out.println(players.getHelmet());
+                                                }
+                                                if (cmd.equalsIgnoreCase("RIGHT_HAND")) {
+                                                    out.println(players.getRight_hand());
+                                                }
+                                                if (cmd.equalsIgnoreCase("LEFT_HAND")) {
+                                                    out.println(players.getLeft_hand());
+                                                }
+                                                if (cmd.equalsIgnoreCase("ARMOR")) {
+                                                    out.println(players.getArmor());
+                                                }
+                                                if (cmd.equalsIgnoreCase("BOOTS")) {
+                                                    out.println(players.getBoots());
+                                                }
+                                                if (cmd.equalsIgnoreCase("GLOVES")) {
+                                                    out.println(players.getGloves());
+                                                }
+                                                if (cmd.equalsIgnoreCase("AMULET")) {
+                                                    out.println(players.getAmulet());
+                                                }
+                                                if (cmd.equalsIgnoreCase("RIGHT_RING")) {
+                                                    out.println(players.getRight_ring());
+                                                }
+                                                if (cmd.equalsIgnoreCase("LEFT_RING")) {
+                                                    out.println(players.getLeft_ring());
+                                                }
+                                                if (cmd.equalsIgnoreCase("FREE_INVENTAR")) {
+                                                    out.println(players.getFreeInventar());
+                                                }
+                                                if (cmd.equalsIgnoreCase("SIZE_INVENTAR")) {
+                                                    out.println(players.getSize_inventory());
+                                                }
+                                                if (cmd.equalsIgnoreCase("INFO_OBJ_HERO")) {
+                                                    //выбираю информацию о предметах в массив
+                                                    res = SelectInfoObjects(9);
+                                                    if (res.equals("ERROR")) {
+                                                        out.println(res);
+                                                    } else {
+                                                        out.println(res); //сервер готов к отправке данных
+                                                        for (int i = 0; i < 9; i++) { //прохожу цикл по к-ву найденых подходящий оппонентов
+                                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                                                break; //выход с цикла и потока
+                                                            }
+                                                            if (cmd.equalsIgnoreCase("NEXT_INFO_OBJ_HERO")) {
+                                                                out.println("YES_NEXT_INFO_OBJ_HERO"); //сервер готов к отправке данных
+                                                            }
+                                                            while (true) {
+                                                                if (cmd.equalsIgnoreCase("END") ||
+                                                                        cmd.equalsIgnoreCase("null") ||
+                                                                        cmd.equalsIgnoreCase(null)) {
+                                                                    break; //выход с цикла и потока
+                                                                }
+
+                                                                cmd = in.readLine();  //слушатель
+
+                                                                if (cmd.equalsIgnoreCase("END") ||
+                                                                        cmd.equalsIgnoreCase("null") ||
+                                                                        cmd.equalsIgnoreCase(null) ||
+                                                                        cmd.equalsIgnoreCase("NEXT_INFO_OBJ_HERO")) {
+                                                                    break; //выход с цикла и потока
+                                                                }
+                                                                if (cmd.equalsIgnoreCase("GET_INFO_OBJ_HERO")) {
+                                                                    out.println(objInfo[i]);
+                                                                }
+                                                                if (cmd.equalsIgnoreCase("GET_TWO_OBJ_HERO")) {
+                                                                    out.println(arrayObjects[i][4]);
+                                                                }
+                                                                if (cmd.equalsIgnoreCase("LAST_INFO_OBJ_HERO")) {
+                                                                    if (i == (objInfo.length - 1)) { //если это последний в списке
+                                                                        out.println("YES_LAST_INFO_OBJ_HERO");
+                                                                        break;
+                                                                    } else out.println("NO_LAST_INFO_OBJ_HERO");
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        //клиент хочет получить все вещи в рюкзаке
+                                        if (cmd.equalsIgnoreCase("GET_INVENTAR")) {  //запрашивает вещи, одетые на герое
+                                            res = SelectAllInventar(); //выбираю все вещи в рюкзаке и храню их двумерном массиве
+                                            if (res.equals("ERROR")) { //если возникла ошибка
+                                                out.println(res);
+                                                cmd = res;
+                                            } else {
+                                                if (res.equals("YES_OBJECTS")) { //если есть предметы в рюкзаке
+                                                    out.println(res); //сервер готов к отправке данных
+                                                    for (int i = 0; i < setCount; i++) { //прохожу цикл по к-ву найденых подходящий оппонентов
+                                                        if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null) || cmd.equalsIgnoreCase("ERROR")) {
+                                                            break; //выход с цикла и потока
+                                                        }
+                                                        if (cmd.equalsIgnoreCase("NEXT_INFO_OBJ_INVENTAR")) {
+                                                            out.println("YES_NEXT_INFO_OBJ_INVENTAR"); //сервер готов к отправке данных
+                                                        }
+                                                        while (true) {
+                                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                                                break; //выход с цикла и потока
+                                                            }
+
+                                                            cmd = in.readLine();  //слушатель
+
+                                                            if (cmd.equalsIgnoreCase("END") ||
+                                                                    cmd.equalsIgnoreCase("null") ||
+                                                                    cmd.equalsIgnoreCase(null) ||
+                                                                    cmd.equalsIgnoreCase("NEXT_INFO_OBJ_INVENTAR")) {
+                                                                break; //выход с цикла и потока
+                                                            }
+                                                            if (cmd.equalsIgnoreCase("GET_ID_OBJ_INVENTAR")) {
+                                                                out.println(arrayObjects[i][0]);
+                                                            }
+                                                            if (cmd.equalsIgnoreCase("GET_WEAR_OBJ_INVENTAR")) {
+                                                                out.println(arrayObjects[i][2]);
+                                                            }
+                                                            if (cmd.equalsIgnoreCase("GET_LVL_OBJ_INVENTAR")) {
+                                                                out.println(arrayObjects[i][3]);
+                                                            }
+                                                            if (cmd.equalsIgnoreCase("GET_QUESTION_OBJ_INVENTAR")) {
+                                                                out.println(arrayObjects[i][5]);
+                                                            }
+                                                            if (cmd.equalsIgnoreCase("GET_QVEST_OBJ_INVENTAR")) {
+                                                                out.println(arrayObjects[i][6]);
+                                                            }
+                                                            if (cmd.equalsIgnoreCase("GET_INFO_OBJ_INVENTAR")) {
+                                                                out.println(objInfo[i]);
+                                                            }
+                                                            if (cmd.equalsIgnoreCase("LAST_INFO_OBJ_INVENTAR")) {  //клиент запрашивает последний ли по списку
+                                                                if (i == (objInfo.length - 1)) { //если это последний в списке
+                                                                    out.println("YES_LAST_INFO_OBJ_INVENTAR");
+                                                                    break;
+                                                                } else out.println("NO_LAST_INFO_OBJ_INVENTAR");
+                                                            }
+                                                        }
+                                                    }
+                                                } else { //рюкзак пуст
+                                                    out.println(res);
+                                                    cmd = "";
+                                                }
+                                            }
+                                        }
+                                        //клиент хочет одеть вещь с рюкзаке
+                                        if (cmd.equalsIgnoreCase("WEAR")) {
+                                            int idObject;
+                                            out.println("ID_OBJECT");
+
+                                            cmd = in.readLine();  //слушатель
+
+                                            System.out.println("Получил 6 - " + cmd);
+
+                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                                break; //выход с цикла и потока
+                                            }else {
+                                                out.println("WHO_WEAR"); //куда одеть предмет
+                                                idObject = Integer.parseInt(cmd); //сохраняю ID предмета, который надо снять
+
+                                                cmd = in.readLine();  //слушатель
+
+                                                System.out.println("Получил 7 - " + cmd);
+
+                                                if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                                    break; //выход с цикла и потока
+                                                } else {
+                                                    res = Wear(idObject, cmd); //одеваю вещь
+                                                    if (res.equals("ERROR")) { //если возникла ошибка
+                                                        out.println(res);
+                                                        cmd = res;
+                                                    } else { //если получилось знять вещь
+                                                        out.println(res);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        //клиент хочет снять с себя вещь
+                                        if (cmd.equalsIgnoreCase("SHOOT")) {
+                                            int idObject;
+                                            res = FreeInventar(); //проверяю свободное место
+                                            if (res.equals("ERROR")) { //если возникла ошибка
+                                                out.println(res);
+                                                cmd = res;
+                                            } else {
+                                                if (res.equals("YES_FREE")) { //есть свободное место
+                                                    out.println(res);
+
+                                                    cmd = in.readLine();  //слушатель
+
+                                                    if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                                        break; //выход с цикла и потока
+                                                    } else {
+                                                        out.println("WHO_SHOOT"); //откуда снять предмет
+                                                        idObject = Integer.parseInt(cmd); //сохраняю ID предмета, который надо снять
+                                                    }
+
+                                                    cmd = in.readLine();  //слушатель
+
+                                                    if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                                        break; //выход с цикла и потока
+                                                    } else {
+                                                        res = Shoot(idObject, cmd);//снимаю вещь
+                                                        if (res.equals("ERROR")) { //если возникла ошибка
+                                                            out.println(res);
+                                                            cmd = res;
+                                                        } else { //если получилось знять вещь
+                                                            out.println(res);
+                                                            break;
+                                                        }
+                                                    }
+                                                } else { //если нет свободного места
+                                                    if (res.equals("NO_FREE")) out.println(res);
+                                                }
+                                            }
+                                        }
+                                        //клиент ВЫБРОСИТЬ вещь
+                                        if (cmd.equalsIgnoreCase("THROW")) {
+                                            out.println("ID_OBJECT");
+
+                                            cmd = in.readLine();  //слушатель
+
+                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                                break; //выход с цикла и потока
+                                            }else {
+                                                res = Throw(Integer.parseInt(cmd)); //выбрасываю вещь
+                                                if (res.equals("ERROR")) { //если возникла ошибка
+                                                    out.println(res);
+                                                    cmd = res;
+                                                } else { //если получилось знять вещь
+                                                    out.println(res);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+                            //клиент меняет Google-аккаунт
+                            if (cmd.equalsIgnoreCase("NEW_GOOGLE")) {  //клиент покидает игру
+                                SelectAllFromPlayers(); //выбираю все данные по герою
+                                while (true) { //слушаю команды
+                                    out.println("NEW_GOOGLE"); //запрашиваю новое имя героя
+                                    cmd = in.readLine();  //сохраняю имя нового героя
+                                    if (cmd.equalsIgnoreCase("END") ||  cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                        break; //выход с цикла и потока
+                                    } else {
+                                        if (IsGoogle(cmd) == true) { //если в БД еще нет такого аккаунта
+                                            String res = ChangeGoogle(cmd); //привьязываю героя к новому аккаунту
+                                            out.println(res);
+                                            break;
+                                        } else {
+                                            out.println("GOOGLE_EXISTS");
+                                            cmd = in.readLine();  //слушаю новую команду
+                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                break; // сервер закрывает сокет и поток
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            //клиент меняет имя героя
+                            if (cmd.equalsIgnoreCase("NEW_NAME_HERO")) {  //клиент покидает игру
+                                SelectAllFromPlayers(); //выбираю все данные по герою
+                                while (true) { //слушаю команды
+                                    out.println("NEW_NAME_HERO"); //запрашиваю новое имя героя
+                                    cmd = in.readLine();  //сохраняю имя нового героя
+                                    if (cmd.equalsIgnoreCase("END") ||  cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) {
+                                        break; //выход с цикла и потока
+                                    } else {
+                                        if (IsNameHero(cmd) == true) { //если новое имя свободно
+                                            String res = ChangeNameHero(cmd); //изменяю имя героя
+                                            out.println(res);
+                                            break;
+                                        } else {
+                                            out.println("NAME_EXISTS");
+                                            cmd = in.readLine();  //слушаю новую команду
+                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                break; // сервер закрывает сокет и поток
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            //клиент меняет уровень защиты на "ВХОД С ПАРОЛЕМ"
+                            if (cmd.equalsIgnoreCase("ENTER_YES_PASS")) {  //клиент покидает игру
+                                SelectAllFromPlayers(); //выбираю все данные по герою
+                                String res = EnterNoPass(1); //изменяю изменяю уровень защиты
+                                out.println(res);  //отправляю результат
+                            }
+
+                            //клиент меняет уровень защиты на "БЕЗ ПАРОЛЯ"
+                            if (cmd.equalsIgnoreCase("ENTER_NO_PASS")) {  //клиент покидает игру
+                                SelectAllFromPlayers(); //выбираю все данные по герою
+                                while (true){
+                                    if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                        break; // сервер закрывает сокет и поток
+                                    }
+                                    out.println("YES_PASS");
+                                    cmd = in.readLine();  //слушаю новую команду
+                                    if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                        break; // сервер закрывает сокет и поток
+                                    } else {
+                                        if (players.getPass().equals(cmd)){
+                                            String res = EnterNoPass(0); //изменяю изменяю уровень защиты
+                                            out.println(res);  //отправляю результат
+                                            break;
+                                        }else { //не верный пароль
+                                            out.println("ERROR_PASS");
+                                            cmd = in.readLine();  //слушаю новую команду
+                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                break; // сервер закрывает сокет и поток
+                                            }
+                                        }
+                                    }
+                                }
+                                String res = EnterNoPass(0); //изменяю изменяю уровень защиты
+                                out.println(res);  //отправляю результат
+                            }
+
+                            //клиент хочет изменить пароль
+                            if (cmd.equalsIgnoreCase("CHANGE_PASS")) {  //клиент покидает игру
+                                SelectAllFromPlayers(); //выбираю все данные по герою
+                                while (true){
+                                    if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                        break; // сервер закрывает сокет и поток
+                                    }
+                                    out.println("YES_PASS");
+                                    cmd = in.readLine();  //слушаю новую команду
+                                    if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                        break; // сервер закрывает сокет и поток
+                                    } else {
+                                        if (players.getPass().equals(cmd)){
+                                            out.println("NEW_PASS");
+                                            cmd = in.readLine();  //слушаю новую команду
+                                            String res = ChangePass(cmd); //изменяю пароль
+                                            out.println(res);  //отправляю результат
+                                            break;
+                                        }else { //не верный пароль
+                                            out.println("ERROR_PASS");
+                                            cmd = in.readLine();  //слушаю новую команду
+                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                break; // сервер закрывает сокет и поток
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             //клиент хочет начать игру сначала
                             if (cmd.equalsIgnoreCase("NEW_GAME")) {  //клиент покидает игру
                                 SelectAllFromPlayers(); //выбираю все данные по герою
                                 while (true){
+                                    if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                        break; // сервер закрывает сокет и поток
+                                    }
                                     out.println("YES_PASS");
                                     cmd = in.readLine();  //слушаю новую команду
                                     if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
@@ -114,14 +514,20 @@ class ServeOneThread extends Thread {
                                     } else {
                                         if (players.getPass().equals(cmd)){
                                             String del = DeleteHero(); //удаляю героя
-                                            out.println(del);  //передаю вопросы клиенту
+                                            out.println(del);  //отправляю результат
                                             break;
-                                        } //получаю ОЗ героя
+                                        }else { //не верный пароль
+                                            out.println("ERROR_PASS");
+                                            cmd = in.readLine();  //слушаю новую команду
+                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                break; // сервер закрывает сокет и поток
+                                            }
+                                        }
                                     }
                                 }
                             }
 
-                            //клиент хочет получить начальные хар-ки героя
+                            //клиент хочет изменить аватар
                             if (cmd.equalsIgnoreCase("CHANGE_AVATAR")) {  //клиент покидает игру
                                 SelectAllFromPlayers(); //выбираю все данные по герою
                                 out.println("NEW_AVATAR");  //передаю вопросы клиенту
@@ -137,8 +543,10 @@ class ServeOneThread extends Thread {
                                 while (true) { //слушаю команды
                                     cmd = in.readLine();  //запись в переменную полученые данные
                                     //клиент покидает игру
-                                    if (cmd.equalsIgnoreCase("END")) {
-                                        break; //выход с цикла
+                                    if (cmd.equalsIgnoreCase("END") ||
+                                            cmd.equalsIgnoreCase("null") ||
+                                                cmd.equalsIgnoreCase(null)) {
+                                        break; //выход с цикла и потока
                                     }
                                     if (cmd.equalsIgnoreCase("RATING")) { //клиент запрашивает рейтинг героя
                                         out.println(Rating(players.getName()));
@@ -184,12 +592,11 @@ class ServeOneThread extends Thread {
                                 while (true){ //слушаю команды
                                     cmd = in.readLine();  //запись в переменную полученые данные
                                     //клиент покидает игру
-                                    if (cmd.equalsIgnoreCase("END")) {
+                                    if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("INVENTAR")) {
                                         break; //выход с цикла
                                     }
                                     //клиент запрашивает Имя героя
                                     if (cmd.equalsIgnoreCase("NAME")) {
-                                        //отправляю данные героя для активити-локиции
                                         out.println(players.getName()); //отсылаю имя героя
                                     }
                                     if (cmd.equalsIgnoreCase("LVL")) {
@@ -242,21 +649,104 @@ class ServeOneThread extends Thread {
                                     if (cmd.equalsIgnoreCase("AVATAR")) { //отсылаю аватар героя
                                         out.println(players.getAvatar());
                                     }
-                                    if (cmd.equalsIgnoreCase("IS_PASS")) { //отсылаю аватар героя
-                                        if (players.getIsPass() == 0) out.println("NO_PASS");
-                                        else {
-                                            while (true){
-                                                out.println("YES_PASS");
-                                                cmd = in.readLine();  //слушаю новую команду
-                                                System.out.println("Пароль в БД - " + players.getPass());
-                                                System.out.println("Пароль на проверку - " + cmd);
+                                    if (cmd.equalsIgnoreCase("IS_PASS")) { //отсылаю запрос на пароль
+                                        if (players.getIsPass() == 0){
+                                            out.println("NO_PASS");
+                                        }
+                                        else{
+                                            while (true) {
                                                 if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
                                                     break; // сервер закрывает сокет и поток
-                                                } else {
-                                                    if (players.getPass().equals(cmd)){
-                                                        out.println("NO_PASS");
-                                                        break;
-                                                    } //получаю ОЗ героя
+                                                }
+                                                out.println("YES_PASS");
+
+                                                cmd = in.readLine();  //слушаю новую команду
+
+                                                if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                    break; // сервер закрывает сокет и поток
+                                                }
+                                                if (players.getPass().equals(cmd)) { //если пароль соответствует
+                                                    out.println("NO_PASS");
+                                                    break;
+                                                }else{ //не верный пароль
+                                                    out.println("ERROR_PASS");
+                                                    cmd = in.readLine();  //слушаю новую команду
+                                                    if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                        break; // сервер закрывает сокет и поток
+                                                    }
+                                                    if (cmd.equalsIgnoreCase("REG_PASS")) { //просит востановить пароль
+                                                        //проверка имени героя
+                                                        while (true) {
+                                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                                break; // сервер закрывает сокет и поток
+                                                            }
+                                                            out.println("NAME_HERO");
+                                                            cmd = in.readLine();  //слушаю новую команду
+                                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                                break; // сервер закрывает сокет и поток
+                                                            }
+                                                            if (players.getName().equals(cmd)) { //если имя соответствует
+                                                                break;
+                                                            }else{
+                                                                out.println("ERROR_NAME_HERO");
+                                                                cmd = in.readLine();  //слушаю новую команду
+                                                                if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                                    break; // сервер закрывает сокет и поток
+                                                                }
+                                                            }
+                                                        }
+                                                        if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                            break; // сервер закрывает сокет и поток
+                                                        }
+                                                        //проверка на дату рождения
+                                                        while (true) {
+                                                            out.println("DATE_BIRTH_PASS");
+                                                            String birthday = String.valueOf(players.getdDateBirth()); //дату в текст
+                                                            cmd = in.readLine();  //слушаю новую команду
+                                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                                break; // сервер закрывает сокет и поток
+                                                            }
+                                                            if (birthday.equals(cmd)) { //если указали верно
+                                                                break;
+                                                            }else{
+                                                                out.println("ERROR_DATE_BIRTH_PASS");
+                                                                cmd = in.readLine();  //слушаю новую команду
+                                                                if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                                    break; // сервер закрывает сокет и поток
+                                                                }
+                                                            }
+                                                        }
+                                                        if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                            break; // сервер закрывает сокет и поток
+                                                        }
+                                                        //проверка на дату регистрации
+                                                        while (true) {
+                                                            out.println("DATE_BEGIN_PASS");
+                                                            String begin = String.valueOf(players.getDateBegin()); //дату в текст
+                                                            cmd = in.readLine();  //слушаю новую команду
+                                                            if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                                break; // сервер закрывает сокет и поток
+                                                            }
+                                                            if (begin.equals(cmd)) { //если указали верно
+                                                                out.println("CHANGE_PASS");
+                                                                cmd = in.readLine();  //слушаю новую команду
+                                                                if (cmd.equalsIgnoreCase("WHAT_NEW_PASS")) {
+                                                                    String new_pass = RegPass();
+                                                                    out.println(new_pass);
+                                                                }
+                                                                cmd = in.readLine();  //слушаю новую команду
+                                                                if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                                    break; // сервер закрывает сокет и поток
+                                                                }
+                                                            } else {
+                                                                out.println("ERROR_DATE_BEGIN_PASS");
+                                                                cmd = in.readLine();  //слушаю новую команду
+                                                                if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("null") || cmd.equalsIgnoreCase(null)) { ////////////клиент выходит с игры
+                                                                    break; // сервер закрывает сокет и поток
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -347,27 +837,27 @@ class ServeOneThread extends Thread {
                                     msg = "REGEN";
                                     ch = ((double) players.getHp() / (double) players.getMax_hp()) * 100;
                                     //нада выставлять от старших уровней до меньших
-                                    if (ch < 99 && players.getLvl() < 10) {
+                                    if (ch < 99 && players.getLvl() <= 10) {
                                         hp_money = 50 * players.getLvl();
                                         hp_G = 0;
                                     }
-                                    if (ch < 66 && players.getLvl() < 10) {
+                                    if (ch < 66 && players.getLvl() <= 10) {
                                         hp_G = (double) (players.getLvl()) / 8;
                                         hp_money = 0;
                                     }
-                                    if (ch < 33 && players.getLvl() < 10) {
+                                    if (ch < 33 && players.getLvl() <= 10) {
                                         hp_G = (double) (players.getLvl()) / 4;
                                         hp_money = 0;
                                     }
-                                    if (ch < 99 && players.getLvl() < 5) {
+                                    if (ch < 99 && players.getLvl() <= 5) {
                                         hp_money = 12 * players.getLvl();
                                         hp_G = 0;
                                     }
-                                    if (ch < 66 && players.getLvl() < 5) {
+                                    if (ch < 66 && players.getLvl() <= 5) {
                                         hp_money = 25 * players.getLvl();
                                         hp_G = 0;
                                     }
-                                    if (ch < 33 && players.getLvl() < 5) {
+                                    if (ch < 33 && players.getLvl() <= 5) {
                                         hp_money = 37 * players.getLvl();
                                         hp_G = 0;
                                     }
@@ -377,27 +867,27 @@ class ServeOneThread extends Thread {
                                     msg = "REGEN";
                                     ch = ((double) players.getHp() / (double) players.getMax_hp()) * 100;
                                     //нада выставлять от старших уровней до меньших
-                                    if (ch < 99 && players.getLvl() < 10) {
+                                    if (ch < 99 && players.getLvl() <= 10) {
                                         mana_money = 50 * players.getLvl();
                                         mana_G = 0;
                                     }
-                                    if (ch < 66 && players.getLvl() < 10) {
+                                    if (ch < 66 && players.getLvl() <= 10) {
                                         mana_G = (double) (players.getLvl()) / 8;
                                         mana_money = 0;
                                     }
-                                    if (ch < 33 && players.getLvl() < 10) {
+                                    if (ch < 33 && players.getLvl() <= 10) {
                                         mana_G = (double) (players.getLvl()) / 4;
                                         mana_money = 0;
                                     }
-                                    if (ch < 99 && players.getLvl() < 5) {
+                                    if (ch < 99 && players.getLvl() <= 5) {
                                         mana_money = 12 * players.getLvl();
                                         mana_G = 0;
                                     }
-                                    if (ch < 66 && players.getLvl() < 5) {
+                                    if (ch < 66 && players.getLvl() <= 5) {
                                         mana_money = 25 * players.getLvl();
                                         mana_G = 0;
                                     }
-                                    if (ch < 33 && players.getLvl() < 5) {
+                                    if (ch < 33 && players.getLvl() <= 5) {
                                         mana_money = 37 * players.getLvl();
                                         mana_G = 0;
                                     }
@@ -417,11 +907,15 @@ class ServeOneThread extends Thread {
                                     ///если хватит денег на реген
                                     if (players.getMoney() >= s_money && players.getGold() >= s_G) {
                                         out.println(msg);
+
                                         cmd = in.readLine();  //запись в переменную полученые данные
+
                                         if (cmd.equalsIgnoreCase("PRICE")) {
                                             out.println(m_money + m_G);
                                         }
+
                                         cmd = in.readLine();  //запись в переменную полученые данные
+
                                         if (cmd.equalsIgnoreCase("YES")) {
                                             Pay((hp_money + mana_money), (hp_G + mana_G)); //снять со счета игрока деньги за исцеление
                                             out.println("GOOD"); //просто нужно что-то отправить, что бы не сбится с очередности приём-передача
@@ -462,28 +956,20 @@ class ServeOneThread extends Thread {
                                     }
                                     //клиент хочет что бы север нашел оппонента по имени
                                     if (cmd.equalsIgnoreCase("SEARCH")) {
-                                        System.out.println("попал сюда 4");
                                         out.println("NAME"); //сервер нашел оппонента по имени
                                         cmd = in.readLine();  //слушаю команду
-                                        System.out.println("Пришло имя - " + cmd);
                                         if(SearchOpponent(cmd) == true) { //если есть такой герой
-                                            String a = "FOUND";
-                                            out.println(a); //сервер нашел оппонента по имени
-                                            System.out.println("Отправил - " + a);
+                                            out.println("FOUND"); //сервер нашел оппонента по имени
                                         }else{
-                                            String a = "NO_FOUND";
-                                            System.out.println("Отправил - " + a);
-                                            out.println(a); //сервер не нашел оппонента по имени
+                                            out.println("NO_FOUND"); //сервер не нашел оппонента по имени
                                         }
                                     }
                                     //клиент хочет получить данные о оппонете
                                     if (cmd.equalsIgnoreCase("GET")) {
                                         out.println("YES"); //сервер готов к отправке данных
-                                        System.out.println("к-во героев а массиве - " + setCount);
                                         for (int i = 0; i < setCount; i++) { //прохожу цикл по к-ву найденых подходящий оппонентов
                                             //клиент покидает это активити
                                             if (cmd.equalsIgnoreCase("END") || cmd.equalsIgnoreCase("SEARCH")){
-                                                System.out.println("попал сюда 2");
                                                 break; //выход с цикла
                                             }
                                             if (cmd.equalsIgnoreCase("NEXT")){
@@ -492,18 +978,14 @@ class ServeOneThread extends Thread {
                                             while (true) {
                                                 cmd = in.readLine();  //запись в переменную полученые данные
 
-                                                System.out.println("Получи 30 - " + cmd);
-
                                                 //клиент покидает это активити
                                                 if (cmd.equalsIgnoreCase("END") ||
                                                         cmd.equalsIgnoreCase("SEARCH") ||
                                                             cmd.equalsIgnoreCase("NEXT")) {
-                                                    System.out.println("попал сюда 1");
                                                     break; //выход с цикла
                                                 }
                                                 //клиент запрашивает Имя героя
                                                 if (cmd.equalsIgnoreCase("NAME")) {
-                                                    System.out.println("имя, которое оправляю - " + name[i]);
                                                     out.println(name[i]); //отсылаю имя героя
                                                 }
                                                 if (cmd.equalsIgnoreCase("LVL")) {
@@ -566,7 +1048,7 @@ class ServeOneThread extends Thread {
                                                 if (cmd.equalsIgnoreCase("ID")) {  //клиент запрашивает ID бота-клона
                                                     out.println(id_bots[i]);
                                                 }
-                                                if (cmd.equalsIgnoreCase("LAST")) {  //клиент запрашивает ID бота-клона
+                                                if (cmd.equalsIgnoreCase("LAST")) {  //клиент запрашивает последний ли по списку этот оппонент
                                                     if (i == (setCount - 1)) { //если это последний герой в списке
                                                         out.println("YES_LAST");
                                                         break;
@@ -726,11 +1208,15 @@ class ServeOneThread extends Thread {
                                         if (courage > 0) {
                                             txtCourage = " и " + courage + " Храбрости";
                                         }
-                                        if (txtExp == "" && txtMoney == "") {
+                                        if (txtExp == "" && txtMoney == "" && txtDrop == "") {
                                             out.println("Вы обыскали труп врага, но ничего не нашли.");  //отправляю клиенту комент о дропе
                                         } else {
-                                            out.println(txtExp + txtCourage + ". Обыскав труп врага, получили " + txtMoney + txtDrop + ".");  //отправляю клиенту комент о победе
-                                        }
+                                            if(txtMoney == "" && txtDrop == ""){
+                                                out.println(txtExp + txtCourage + ".");
+                                            }else{
+                                                out.println(txtExp + txtCourage + ". Обыскав труп врага, получили " + txtMoney + txtDrop + ".");  //отправляю клиенту комент о победе
+                                            }
+                                         }
                                         //Проверяю апп
                                         cmd = in.readLine();  //запись в переменную полученые данные
                                         if (cmd.equalsIgnoreCase("UP_LVL")) {
@@ -779,13 +1265,14 @@ class ServeOneThread extends Thread {
                                     players.setSex(Integer.parseInt(in.readLine())); //сохраняю в сеттер пол нового героя
                                     out.println("AVATAR"); //запрашиваю имя файла выбраного аватара
                                     players.setAvatar(in.readLine()); //сохраняю в сеттер имя файла выбраного аватара
-                                    out.println("PASS"); //запрашиваю имя файла выбраного аватара
+                                    out.println("PASS"); //запрашиваю пароль
                                     players.setPass(in.readLine()); //сохраняю в сеттер имя файла выбраного аватара
                                     if (CreateNewBot(cmd) == true) { //создаю бота-клона
                                         bots.setId(NewIdBot()); //пишу значение ID бота-клона
                                         if (CreateNewHero(cmd) == true) { //создаю нового героя
                                             out.println("REGISTERED");
-                                            break; //выход с цикла и потока
+                                            cmd = in.readLine();
+                                            if (cmd.equalsIgnoreCase("OK_REG")) break; //выход с цикла и потока
                                         }
                                     }
                                 } else {
@@ -819,36 +1306,585 @@ class ServeOneThread extends Thread {
         if (players != null) { players = null; }  //закрываю экземпляры открытых классов
     }
 
+
+
+    //убираю предмет с рюкзака
+    private String Throw(int object) {
+        String tt;
+        int id = 0;
+        try {
+            // УЗНАЮ ID вещи, которую нужно выюросить
+            query = "SELECT id FROM inventory WHERE id_players = '"+ players.getId() +"' AND id_Objects = " + object + ";";
+            res = statement.executeQuery(query); //запускаю запрос
+            //в цикле прохожу всю таблицу запроса и пишу данные в переменные
+            while (res.next()) {
+                id = res.getInt("id");
+                break;
+            }
+            if (id == 0) tt = "ERROR"; // если возникла ошибка
+            else{
+                query = "UPDATE inventory SET id_players = '' WHERE id = " + id + ";"; //код SQL-запроса
+                statement.executeUpdate(query); //выполнение запроса
+                tt = "YES_THROW";
+            }
+        } catch (SQLException e) {
+            tt = "ERROR";
+            System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Невозможно выбросить вещь");
+        }
+        return tt;
+    }
+
+    //одеваю вещь на героя и убираю её с рюкзака
+    private String Wear(int object, String who) {
+        String wear;
+        String res;
+        boolean sverka = true, k; //флаг
+        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+        if (res.equals("ERROR")) wear = res;
+        else {
+            try {
+                //определяю куда надо одеть этот предмет
+                //одеваю на ГОЛОВУ
+                if (who.equalsIgnoreCase("POH") && objects.getHelmet() == 1 && sverka == true) { //если вещь одевается на голову
+                    k = false;
+                    //проверяю, одета ли другая вещь на голову
+                    if (players.getHelmet() > 0) { //если на голову уже одета другая вещь, тогда
+                        res = Shoot(players.getHelmet(), "SW_HELMET");//снимаю вещь c головы
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если на голове ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET helmet = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                //одеваю на ТЕЛО
+                if (who.equalsIgnoreCase("POH") && objects.getArmor() == 1 && sverka == true) { //если вещь одевается на тело
+                    k = false;
+                    //проверяю, одета ли другая вещь на тело
+                    if (players.getArmor() > 0) { //если на тело уже одета другая вещь, тогда
+                        res = Shoot(players.getArmor(), "SW_ARMOR");//снимаю вещь c телa
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если на телe ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET armor = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                //одеваю на НОГИ
+                if (who.equalsIgnoreCase("POH") && objects.getBoots() == 1 && sverka == true) { //если вещь одевается на ноги
+                    k = false;
+                    //проверяю, одета ли другая вещь на ноги
+                    if (players.getBoots() > 0) { //если на ноги уже одета другая вещь, тогда
+                        res = Shoot(players.getBoots(), "SW_BOOTS");//снимаю вещь c ног
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если на ногах ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET boots = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                //одеваю на РУКИ
+                if (who.equalsIgnoreCase("POH") && objects.getGloves() == 1 && sverka == true) { //если вещь одевается на руки
+                    k = false;
+                    //проверяю, одета ли другая вещь на руки
+                    if (players.getGloves() > 0) { //если на руках уже одета другая вещь, тогда
+                        res = Shoot(players.getGloves(), "SW_GLOVES");//снимаю вещь c рук
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если на руках ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET gloves = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                //одеваю на ШЕЮ
+                if (who.equalsIgnoreCase("POH") && objects.getAmulet() == 1 && sverka == true) { //если вещь одевается на шею
+                    k = false;
+                    //проверяю, одета ли другая вещь на шею
+                    if (players.getAmulet() > 0) { //если на шее уже одета другая вещь, тогда
+                        res = Shoot(players.getAmulet(), "SW_AMULET");//снимаю вещь c шеи
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если на шее ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET amulet = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                //одеваю на ПРАВЫЙ ПАЛЕЦ
+                if (who.equalsIgnoreCase("RIGHT") && objects.getRight_ring() == 1 && sverka == true) { //если вещь одевается на правий палец
+                    k = false;
+                    //проверяю, одета ли другая вещь на правий палец
+                    if (players.getRight_ring() > 0) { //если на правом пальце уже одета другая вещь, тогда
+                        res = Shoot(players.getRight_ring(), "SW_RIGHT_RING");//снимаю вещь c правого пальца
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если на правом пальце ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET right_ring = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                //одеваю на ЛЕВЫЙ ПАЛЕЦ
+                if (who.equalsIgnoreCase("LEFT") && objects.getRight_ring() == 1 && sverka == true) { //если вещь одевается на левый палец
+                    k = false;
+                    //проверяю, одета ли другая вещь на левый палец
+                    if (players.getLeft_ring() > 0) { //если на левом пальце уже одета другая вещь, тогда
+                        res = Shoot(players.getLeft_ring(), "SW_LEFT_RING");//снимаю вещь c левого пальца
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если на левом пальце ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET left_ring = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                //беру в ЛЕВУЮ РУКУ
+                if ((who.equalsIgnoreCase("LEFT") || who.equalsIgnoreCase("POH")) && objects.getLeft_hand() == 1 && sverka == true && objects.getIsTwoHanded() == 0) { //если вещь можно взять в левую руку
+                    System.out.println("//беру в ЛЕВУЮ РУКУ");
+                    k = false;
+                    //проверяю, взята ли другая вещь в левую руку
+                    if (players.getLeft_hand() > 0) { //если в левой руке уже есть другая вещь, тогда
+                        System.out.println("//проверяю, взята ли другая вещь в левую руку");
+                        res = Shoot(players.getLeft_hand(), "SW_LEFT_HAND");  //снимаю вещь c левой руке
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если в левой руке ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        System.out.println("//выбираю всю инфу о предмете = " + res);
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET left_hand = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                //беру в ПРАВУЮ РУКУ
+                if (who.equalsIgnoreCase("RIGHT") && objects.getRight_hand() == 1 && sverka == true && objects.getIsTwoHanded() == 0) { //если вещь можно взять в правую руку
+                    k = false;
+                    //проверяю, взята ли другая вещь в правую руку
+                    if (players.getRight_hand() > 0) { //если в правой руке уже есть другая вещь, тогда
+                        res = Shoot(players.getRight_hand(), "SW_RIGHT_HAND");  //снимаю вещь c правой руке
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если в правой руке ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET right_hand = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                //беру в ОБЕИ РУКИ
+                if (who.equalsIgnoreCase("POH") && objects.getRight_hand() == 1 && sverka == true && objects.getIsTwoHanded() == 1) { //если вещь можно взять в обеи руки
+                    k = false;
+                    //проверяю, взята ли другая вещь в обеи руки
+                    if (players.getRight_hand() > 0) { //если в руках есть другая вещь, тогда
+                        res = Shoot(players.getRight_hand(), "SW_RIGHT_HAND");  //снимаю вещь c правой руке
+                        if (res.equals("ERROR")) { //если возникла ошибка
+                            wear = res;
+                        } else { //если получилось снять вещь
+                            k = true;
+                        }
+                    } else k = true; //если в руках ничего нет
+                    if (k == true) {
+                        res = SelectAllObject(object);         //выбираю всю инфу о предмете
+                        if (res.equals("ERROR")) wear = res;
+                        else {
+                            sverka = false;
+                            query = "UPDATE players SET right_hand = " + object + ", left_hand = " + object + ", str = str + " + objects.getStr() + ", dex = dex + " + objects.getDex() +
+                                    ", inst = inst + " + objects.getInst() + ", def = def + " + objects.getDef() + ",  max_hp = max_hp + " + objects.getHp() +
+                                    ", max_mana = max_mana + " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                        }
+                    }
+                }
+                statement.executeUpdate(query);
+                res = Throw(object);
+                if (res.equals("ERROR")) { //если возникла ошибка
+                    wear = res;
+                } else { //если получилось снять вещь
+                    wear = "YES_WEAR";
+                }
+            } catch (SQLException e) {
+                wear = "ERROR";
+                System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Немогу одеть героя");
+            }
+        }
+        return wear;
+    }
+
+    //Метод для поиска пустых записей в Inventory или Execution
+    private int NewRecno(String table) {
+        int id = 0;
+        try {
+            //ищу пустые записи в таблице
+            query = "SELECT COUNT(*) AS kol FROM " + table + " WHERE id_players = '';";
+            res = statement.executeQuery(query); //запускаю запрос
+            //в цикле прохожу всю таблицу запроса и пишу данные в переменные
+            while (res.next()) {
+                setCount = res.getInt("kol");
+            }
+            if(setCount > 0) { //если есть пустые записи
+                //запоминаю ID пустой записи
+                query = "SELECT id FROM inventory WHERE id_players = '';";
+                res = statement.executeQuery(query); //запускаю запрос
+                //в цикле прохожу всю таблицу запроса и пишу данные в переменные
+                while (res.next()) {
+                    id = res.getInt("id");
+                    break;
+                }
+            }else id = 0; //если нет пустых записей
+        } catch (SQLException e) {
+            id = 0;
+            System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Невозможно добавить новую запись");
+        }
+        return id;
+    }
+
+    //снимаю вещь с героя и добавляю её в рюкзак
+    private String Shoot(int object, String type) {
+        String shoot;
+        boolean sverka = true; //флаг для сверки ID предмета и частуй тела героя
+        //выбираю всю инфу о предмете
+        String res = SelectAllObject(object);
+        if (res.equals("ERROR")) shoot = res;
+        else {
+            try {
+                //сверяю откуда снять с ID предмета, который надо снять
+                //в запросе снимаю эту вещь и уменьшаю хар-ки, которые она додавала
+                if(type.equalsIgnoreCase("SW_HELMET") && object == players.getHelmet() && sverka == true) { //если вещь одета на голову
+                    sverka = false;
+                    query = "UPDATE players SET helmet = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ",  max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_ARMOR") && object == players.getArmor() && sverka == true) { //если вещь одета на торс
+                    sverka = false;
+                    query = "UPDATE players SET armor = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_BOOTS") && object == players.getBoots() && sverka == true) { //если вещь одета на ноги
+                    sverka = false;
+                    query = "UPDATE players SET boots = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_GLOVES") && object == players.getGloves() && sverka == true) { //если вещь одета на руки
+                    sverka = false;
+                    query = "UPDATE players SET gloves = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_AMULET") && object == players.getAmulet() && sverka == true) { //если вещь одета на шею
+                    sverka = false;
+                    query = "UPDATE players SET amulet = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_RIGHT_RING") && object == players.getRight_ring() && sverka == true) { //если вещь одета на правый палец
+                    sverka = false;
+                    query = "UPDATE players SET right_ring = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_LEFT_RING") && object == players.getLeft_ring() && sverka == true) { //если вещь одета на левый палец
+                    sverka = false;
+                    query = "UPDATE players SET left_ring = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_LEFT_HAND") && object == players.getLeft_hand() && sverka == true && objects.getIsTwoHanded() == 0) { //если вещь одета на левую руку и одна одноручная
+                    sverka = false;
+                    query = "UPDATE players SET left_hand = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_LEFT_HAND") && object == players.getLeft_hand() && sverka == true && objects.getIsTwoHanded() == 1) { //если вещь одета на левую руку и одна двуручная
+                    sverka = false;
+                    query = "UPDATE players SET right_hand = 0, left_hand = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_RIGHT_HAND") && object == players.getRight_hand() && sverka == true && objects.getIsTwoHanded() == 0) { //если вещь одета на правую руку и одна одноручная
+                    sverka = false;
+                    query = "UPDATE players SET right_hand = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                if(type.equalsIgnoreCase("SW_RIGHT_HAND") && object == players.getRight_hand() && sverka == true && objects.getIsTwoHanded() == 1) { //если вещь одета на правую руку и одна двуручная
+                    sverka = false;
+                    query = "UPDATE players SET right_hand = 0, left_hand = 0, str = str - " + objects.getStr() + ", dex = dex - " + objects.getDex() +
+                            ", inst = inst - " + objects.getInst() + ", def = def - " + objects.getDef() + ", max_hp = max_hp - " + objects.getHp() +
+                            ", max_mana = max_mana - " + objects.getMana() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                }
+                statement.addBatch(query); //запрос в очереди
+                //ложу вещь в рюкзак
+                int id = NewRecno("inventory");
+                if (id > 0){ //если есть ID пустой записи
+                    query = "UPDATE inventory SET id_players = '" + players.getId() + "', id_Objects = " + object + ", kol = 1" +
+                            " WHERE id = " + id + ";"; //код SQL-запроса
+                }else{
+                    query = "INSERT INTO inventory (id_players, id_Objects, kol) VALUES ('" + players.getId() + "', " + object + ", 1);"; //код SQL-запроса
+                }
+                statement.addBatch(query); //запрос в очереди
+                statement.executeBatch(); //выполнение всех запросов
+                statement.clearBatch(); //очищает весь пакет запросов
+                shoot = "YES_SHOOT";
+            } catch (SQLException e) {
+                shoot = "ERROR";
+                System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Немогу раздеть героя");
+            }
+        }
+        return shoot;
+    }
+
+    //выбираю все данные о предмете
+    private String SelectAllObject(int object) {
+        String select;
+        try {
+            query = "SELECT * FROM objects WHERE id_Objects = " + object + ";";
+            res = statement.executeQuery(query); //запускаю запрос
+            //в цикле прохожу всю таблицу запроса и пишу данные в переменные
+            while (res.next()) {
+                objects.setName(res.getString("name"));
+                objects.setLvl(res.getInt("lvl"));
+                objects.setPrise(res.getInt("prise"));
+                objects.setStr(res.getInt("str"));
+                objects.setDex(res.getInt("dex"));
+                objects.setInst(res.getInt("inst"));
+                objects.setDef(res.getInt("def"));
+                objects.setHp(res.getInt("hp"));
+                objects.setHelmet(res.getInt("helmet"));
+                objects.setRight_hand(res.getInt("right_hand"));
+                objects.setLeft_hand(res.getInt("left_hand"));
+                objects.setArmor(res.getInt("armor"));
+                objects.setBoots(res.getInt("boots"));
+                objects.setGloves(res.getInt("gloves"));
+                objects.setAmulet(res.getInt("amulet"));
+                objects.setRight_ring(res.getInt("right_ring"));
+                objects.setIsStakan(res.getInt("isStakan"));
+                objects.setIsQuest(res.getInt("isQuest"));
+                objects.setIsTwoHanded(res.getInt("isTwoHanded"));
+                objects.setIsWear(res.getInt("isWear"));
+            }
+            select = "NO_ERROR";
+        } catch (SQLException e) {
+            select = "ERROR";
+            System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Выбираю данные о предмете");
+        }
+        return select;
+    }
+
+    //изменение Google-аккаунта
+    private String ChangeGoogle(String acoutn) {
+        String change = "ERROR";
+        if (players.getGold() >= 50) { //если хватает денег на запрос
+            try {
+                query = "UPDATE players SET id_players = '" + acoutn + "', gold = gold - 50, LoseGold = LoseGold + 50 WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                statement.addBatch(query); //запрос в очереди
+                query = "UPDATE execution SET id_players = '" + acoutn + "' WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                statement.addBatch(query); //запрос в очереди
+                query = "UPDATE inventory SET id_players = '" + acoutn + "' WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                statement.addBatch(query); //запрос в очереди
+                statement.executeBatch(); //выполнение всех запросов
+                statement.clearBatch(); //очищает весь пакет запросов
+                change = "YES_CHANGE";
+            } catch (SQLException e) {
+                change = "ERROR";
+                System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Изменение имени героя");
+            }
+        }
+        return change;
+    }
+
+    //изменение имени героя
+    private String ChangeNameHero(String name) {
+        String change = "ERROR";
+        if (players.getGold() >= 100) { //если хватает денег на запрос
+            try {
+                query = "UPDATE players SET name = '" + name + "', gold = gold - 100, LoseGold = LoseGold + 100 WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                statement.executeUpdate(query); //выполнение запроса
+                change = "YES_CHANGE";
+            } catch (SQLException e) {
+                change = "ERROR";
+                System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Изменение имени героя");
+            }
+        }
+        return change;
+    }
+
+    //изменение уровня защиты
+    private String EnterNoPass(int d) {
+        String change;
+        try {
+            query = "UPDATE players SET isPass = " + d + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+            statement.executeUpdate(query); //выполнение запроса
+            change = "YES_CHANGE";
+        } catch (SQLException e) {
+            change = "ERROR";
+            System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Изменение уровня защиты");
+        }
+        return change;
+    }
+
+    //изменение пароля
+    private String ChangePass(String newPass) {
+        String change;
+        try {
+            //меняю пароля
+            query = "UPDATE players SET pass = '" + newPass + "' WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+            statement.executeUpdate(query); //выполнение запроса
+            change = "YES_CHANGE";
+        } catch (SQLException e) {
+            change = "ERROR";
+            System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Изменение пароля");
+        }
+        return change;
+    }
+
+    //востанавливаю пароль
+    private String RegPass() throws SQLException {
+        String pass = "";
+        Random rand = new Random(); //рандом
+        //массив возможных символов
+        String[] s = new String[]{"q","Q","w","W","e","E","r","R","t","T","y","Y","u","U","i","I","o","O","p","P",
+                "a","A","s","S","d","D","f","F","g","G","h","H","j","J","k","K","l","L",
+                "z","Z","x","X","c","C","v","V","b","B","n","N","m","M",
+                "1","2","3","4","5","6","7","8","9","0"};
+        int lengthPass = RandomTwo(7, 15); //длина пароля от 7 до 15 символов
+        for (int i = 1; i <= lengthPass; i++) {
+            pass = pass + (s[rand.nextInt(s.length)]);  //генератор пароля
+        }
+        try {
+            //пишу новый пароль в БД
+            query = "UPDATE players SET pass = '" + pass + "' WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+            statement.executeUpdate(query); //выполнение запроса
+        }catch (SQLException e) {
+            pass = "ERROR";
+            System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Востановление пароля");
+        }
+        return pass;
+    }
+
     //удаляю героя
-    private String DeleteHero() throws SQLException {
-        String del = "NO_DELETE";
-        //удаляю запись в таблице players
-        query = "DELETE FROM players WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
-        statement.addBatch(query); //запрос в очереди
-        //удаляю бота-клона в таблице bots
-        query = "DELETE FROM bots WHERE id_bots = '" + players.getId_bots() + "';"; //код SQL-запроса
-        statement.addBatch(query); //запрос в очереди
-        //удаляю запись в таблице execution
-        query = "DELETE FROM execution WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
-        statement.addBatch(query); //запрос в очереди
-        //удаляю запись в таблице inventory
-        query = "DELETE FROM inventory WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
-        statement.addBatch(query); //запрос в очереди
-        //удаляю запись в таблице inventory
-        query = "DELETE FROM inventory WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
-        statement.addBatch(query); //запрос в очереди
-        statement.executeBatch(); //выполнение всех запросов
-        statement.clearBatch(); //очищает весь пакет запросов
-        del = "YES_DELETE";
+    private String DeleteHero() {
+        String del;
+        try {
+            //удаляю запись в таблице players
+            query = "DELETE FROM players WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+            statement.addBatch(query); //запрос в очереди
+            //удаляю бота-клона в таблице bots
+            query = "DELETE FROM bots WHERE id_bots = '" + players.getId_bots() + "';"; //код SQL-запроса
+            statement.addBatch(query); //запрос в очереди
+            //обнуляю все записи запись в таблице execution
+            query = "UPDATE execution SET id_players = '' WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+            statement.addBatch(query); //запрос в очереди
+            //обнуляю все записи запись в таблице inventory
+            query = "UPDATE inventory SET id_players = '' WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+            statement.addBatch(query); //запрос в очереди
+            statement.executeBatch(); //выполнение всех запросов
+            statement.clearBatch(); //очищает весь пакет запросов
+            del = "YES_DELETE";
+        } catch (SQLException e) {
+            del = "ERROR";
+            System.out.println("Не удалось выполнить запрос клиента - " + HostName + ", ID - " + players.getId() + " на удаление героя");
+        }
         return del;
     }
 
     //меняю аватар героя
     private boolean ChangeAvatar(String name) throws SQLException {
         boolean isYes = false;
-        query = "UPDATE players SET avatar = '" + name + "', gold = gold - 30 WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
-        statement.executeUpdate(query); //выполнение запроса
-        isYes = true;
+        if (players.getGold() >= 30) { //если хватает денег на запрос
+            try {
+                query = "UPDATE players SET avatar = '" + name + "', gold = gold - 30, LoseGold = LoseGold + 30 WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
+                statement.executeUpdate(query); //выполнение запроса
+                isYes = true;
+            } catch (SQLException e) {
+                isYes = false;
+                System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Изменение аватара");
+            }
+        }
         return isYes;
     }
 
@@ -909,7 +1945,6 @@ class ServeOneThread extends Thread {
                 avatar[i] = res.getString("avatar");
                 id_bots[i] = res.getInt("id_bots");
                 sex[i] = res.getInt("sex");
-                System.out.println("имя, которое нашел - " + name[i]);
             }
             search = true;
         }
@@ -1166,10 +2201,12 @@ class ServeOneThread extends Thread {
         query = "UPDATE players SET money = " + players.getMoney() +
                 ", gold = " + players.getGold() + ", days = " + players.getDays() + "" +
                 ", LastDate = CURRENT_DATE() WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
-        statement.executeUpdate(query); //выполнение запроса
+        statement.addBatch(query); //запрос в очереди
         //пишу к-во подареных голдов
         query = "UPDATE players SET BountyGold = BountyGold + " +  bounty.getGold() + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
-        statement.execute(query);  //выполняю запрос
+        statement.addBatch(query); //запрос в очереди
+        statement.executeBatch(); //выполнение всех запросов
+        statement.clearBatch(); //очищает весь пакет запросов
         float fGold = (float) bounty.getGold(); //пишу значение голда у float, что бы обрезать лишнее после запятой
         msg = players.getDays() + "-й день: " + bounty.getMoney() + " монет и " + fGold + " G. Обязательно заходи завтра, подарки будут еще круче!";
     }
@@ -1178,10 +2215,12 @@ class ServeOneThread extends Thread {
     private void Pay(int money, double G) throws SQLException {
         //снимаю деньги
         query = "UPDATE players SET money = money - " + money + ", gold = gold - " + G + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
-        statement.execute(query);  //выполняю запрос
+        statement.addBatch(query); //запрос в очереди
         //пишу статистику потраченых голдов
         query = "UPDATE players SET LastGold = LastGold + " + G + " WHERE id_players = '" + players.getId() + "';"; //код SQL-запроса
-        statement.execute(query);  //выполняю запрос
+        statement.addBatch(query); //запрос в очереди
+        statement.executeBatch(); //выполнение всех запросов
+        statement.clearBatch(); //очищает весь пакет запросов
         players.setHp(players.getMax_hp());
         players.setMana(players.getMax_mana());
         UpdateHpHero();
@@ -1189,25 +2228,27 @@ class ServeOneThread extends Thread {
     }
 
     //создаю нового героя
-    private boolean CreateNewHero (String name) throws SQLException {
+    private boolean CreateNewHero (String name){
         boolean createNewHero = false;
-        query = "INSERT INTO players (id_players, name, pass, isPass, maxEnemyUron, maxMyUron, pvp_v, pvp_l, pve_l, pve_v, DateBegin, LastDate, isHoliday, " +
-                "isBirthday, BountyGold, LoseGold, days, lvl, exp, vip_lvl, vip_exp, pvp_lvl, pvp_exp, str, dex, inst, def, hp, max_hp, mana, " +
-                "max_mana, money, gold, id_bots, DateBirth, sex, avatar) " +
-                "VALUES ('" + players.getId() + "', '" + name + "', '" + players.getPass() + "', 0, 0, 0, 0, 0, 0, 0, CURRENT_DATE(), CURRENT_DATE()-1, 1, 0, 0, 0, 0," +
-                "1, 0, 0, 0, 1, 0, 10, 10, 10, 10, 40, 40, 0, 0, 0, 0, " +
-                bots.getId() + ", '" + players.getsDateBirth() + "', " + players.getSex() + ", '" + players.getAvatar() + "');"; //код SQL-запроса
-        statement.execute(query);  //выполняю запрос
-        //ложу в инвентарь нового героя две первые вещи
-        query = "INSERT INTO inventory (id_players, id_Objects, kol) " +
-                "VALUES ('" + players.getId() + "', 1, 1);"; //код SQL-запроса
-        statement.addBatch(query); //запрос в очереди
-        query = "INSERT INTO inventory (id_players, id_Objects, kol) " +
-                "VALUES ('" + players.getId() + "', 2, 1);"; //код SQL-запроса
-        statement.addBatch(query); //запрос в очереди
-        statement.executeBatch(); //выполнение всех запросов
-        statement.clearBatch(); //очищает весь пакет запросов
-        createNewHero = true;
+        try {
+            query = "INSERT INTO players (id_players, name, pass, isPass, maxEnemyUron, maxMyUron, pvp_v, pvp_l, pve_l, pve_v, DateBegin, LastDate, isHoliday, " +
+                    "isBirthday, BountyGold, LoseGold, days, lvl, exp, vip_lvl, vip_exp, pvp_lvl, pvp_exp, str, dex, inst, def, hp, max_hp, mana, " +
+                    "max_mana, money, gold, id_bots, DateBirth, sex, avatar, helmet, right_hand, left_hand, armor, boots, gloves, amulet, right_ring, left_ring) " +
+                    "VALUES ('" + players.getId() + "', '" + name + "', '" + players.getPass() + "', 0, 0, 0, 0, 0, 0, 0, CURRENT_DATE(), CURRENT_DATE()-1, 1, 0, 0, 0, 0," +
+                    "1, 0, 0, 0, 1, 0, 10, 10, 10, 10, 40, 40, 0, 0, 0, 0, " +
+                    bots.getId() + ", '" + players.getsDateBirth() + "', " + players.getSex() + ", '" + players.getAvatar() + "',0,0,0,0,0,0,0,0,0);"; //код SQL-запроса
+            statement.addBatch(query);
+            //ложу в инвентарь нового героя две первые вещи
+            query = "INSERT INTO inventory (id_players, id_Objects, kol) " +
+                    "VALUES ('" + players.getId() + "', 3, 1);"; //код SQL-запроса
+            statement.addBatch(query); //запрос в очереди
+            statement.executeBatch(); //выполнение всех запросов
+            statement.clearBatch(); //очищает весь пакет запросов
+            createNewHero = true;
+        } catch (SQLException e) {
+            createNewHero = false;
+            System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Создать нового героя");
+        }
         return createNewHero;
     }
 
@@ -1231,6 +2272,21 @@ class ServeOneThread extends Thread {
             newIdBot = (res.getInt("ID"));
         }
         return newIdBot;
+    }
+
+    //проверка Google-аккаунта
+    private boolean IsGoogle (String acount) throws SQLException {
+        boolean isGoogle = false;
+        query = "SELECT COUNT(*) AS kol FROM players WHERE id_players = '" + acount + "';";
+        res = statement.executeQuery(query); //запускаю запрос
+        setCount = 1;
+        while (res.next()) {
+            setCount = res.getInt("kol");
+        }
+        if (setCount == 0) {  //если в БД незарегестрирован такой Google-аккаунт
+            isGoogle = true;
+        }
+        return isGoogle;
     }
 
     //проверка имени героя
@@ -1325,6 +2381,147 @@ class ServeOneThread extends Thread {
         return upLvl;
     }
 
+    //выбираю информацию с массива предметов в рюкзаке в один массив и добавляю еще инфу в двумерный массив
+    private String SelectInfoObjects(int length) {
+        String select;
+        objInfo = new String[length];  //иициализирую массив информации о предмете
+        //Буду проходить по всем предметам и писать их инфу в массив
+        String info = "";
+        for (int i = 0; i < length; i++){
+            if(arrayObjects[i][0] > 0) { //если вещь одета или вообще существует
+                String res = SelectAllObject(arrayObjects[i][0]); //выбираю данные о предмете
+                if(res.equalsIgnoreCase("ERROR")) select = "ERROR";
+                else {
+                    info = objects.getName();
+                    if (objects.getLvl() > players.getLvl()) { //если уровень вещи больше чем уровень перса
+                        info = info + ". Необходимый уровень: " + objects.getLvl();
+                    }
+                    if (objects.getIsQuest() == 1) { //если вещи квестовая
+                        info = info + ". Квестовая вещь";
+                    }
+                    if (objects.getHelmet() == 1) { //если она одевается на голову
+                        info = info + ". Одевается на голову";
+                        arrayObjects[i][5] = 0; //одевать вещи по-умолчанию
+                    }
+                    if (objects.getLeft_hand() == 1 && objects.getIsTwoHanded() == 0) { //если она одевается на левую руку
+                        info = info + ". Можно взять в левую руку";
+                        arrayObjects[i][5] = 0; //одевать вещи по-умолчанию
+                    }
+                    if (objects.getRight_hand() == 1 && objects.getIsTwoHanded() == 0) { //если она одевается на правую руку
+                        info = info + ". Можно взять в правую руку";
+                        arrayObjects[i][5] = 1; //спрашивать куда одеть
+                    }
+                    if (objects.getRight_hand() == 1 && objects.getIsTwoHanded() == 1) { //если она двуручная
+                        info = info + ". Нужно брать в две руки ";
+                        arrayObjects[i][5] = 0; //одевать вещи по-умолчанию
+                    }
+                    if (objects.getArmor() == 1) { //если она одевается на тело
+                        info = info + ". Одевается на торс";
+                        arrayObjects[i][5] = 0; //одевать вещи по-умолчанию
+                    }
+                    if (objects.getBoots() == 1) { //если она одевается на ноги
+                        info = info + ". Одевается на ноги";
+                        arrayObjects[i][5] = 0; //одевать вещи по-умолчанию
+                    }
+                    if (objects.getGloves() == 1) { //если она одевается на руки
+                        info = info + ". Одевается на руки";
+                        arrayObjects[i][5] = 0; //одевать вещи по-умолчанию
+                    }
+                    if (objects.getAmulet() == 1) { //если она одевается на шею
+                        info = info + ". Одевается на шею";
+                        arrayObjects[i][5] = 0; //одевать вещи по-умолчанию
+                    }
+                    if (objects.getRight_ring() == 1) { //если она одевается на палец
+                        info = info + ". Одевается на палец";
+                        arrayObjects[i][5] = 1; //спрашивать куда одеть
+                    }
+                    if (objects.getStr() > 0) { //если она добавляет силу
+                        info = info + ". Сила + " + objects.getStr();
+                    }
+                    if (objects.getDex() > 0) { //если она добавляет ловкость
+                        info = info + ". Ловкость + " + objects.getDex();
+                    }
+                    if (objects.getInst() > 0) { //если она добавляет интуиция
+                        info = info + ". Интуиция + " + objects.getInst();
+                    }
+                    if (objects.getDef() > 0) { //если она добавляет защиту
+                        info = info + ". Защита + " + objects.getDef();
+                    }
+                    if (objects.getHp() > 0) { //если она добавляет здоровье
+                        info = info + ". Здоровье + " + objects.getHp();
+                    }
+                    if (objects.getMana() > 0) { //если она добавляет ману
+                        info = info + ". Мана + " + objects.getMana();
+                    }
+                    if (objects.getIsStakan() == 1) { //если стаканентся
+                        info = info + ". Количество: " + arrayObjects[i][1] + " шт";
+                    }
+                    if (objects.getPrise() > 0) { //если она продается
+                        info = info + ". Цена на продажу: " + (objects.getPrise() * arrayObjects[i][1] + " монет");
+                    }
+                    info = info + ".";
+                    arrayObjects[i][2] = objects.getIsWear(); //пишу одеваемая вещь или нет
+                    arrayObjects[i][3] = objects.getLvl(); //пишу уровень предмета
+                    arrayObjects[i][4] = objects.getIsTwoHanded(); //пишу двуручный предмет или нет
+                    arrayObjects[i][6] = objects.getIsQuest(); //пишу квестовая вещь или нет
+                }
+            }else{ //если ничего не одето
+                info = "Ничего не одето"; //записываю окончательную информацию о предмете в массив
+                arrayObjects[i][2] = 0; //пишу одеваемая вещь или нет
+                arrayObjects[i][3] = 0; //пишу уровень предмета
+                arrayObjects[i][4] = 0; //пишу двуручный предмет или нет
+                arrayObjects[i][6] = 0; //пишу квестовая вещь или нет
+            }
+            objInfo[i] = info; //записываю окончательную информацию о предмете в массив
+        }
+        select = "YES_INFO_OBJ_HERO";
+        return select;
+    }
+
+    //выборка всех вещей в рюкзаке
+    private String SelectAllInventar() {
+        String select = "ERROR";
+        try {
+            //узнаю к-во предметов в рюкзаке
+            query = "SELECT COUNT(*) AS kol FROM inventory WHERE id_players ='" + players.getId() + "';";
+            res = statement.executeQuery(query); //запускаю запрос
+            while (res.next()) {
+                setCount = (res.getInt("kol"));
+            }
+            if (setCount > 0) { //если есть вещи
+                int o = 0;
+                // создаем двумерный массив setCount на 2 для хранения вещей в рюкзаке и их к-во
+                arrayObjects = new int[setCount][7];
+                //выбираю все вещи в рюкзаке
+                query = "SELECT id_Objects, kol FROM inventory WHERE id_players ='" + players.getId() + "' ORDER BY id_Objects;";
+                res = statement.executeQuery(query); //запускаю запрос
+                //в цикле прохожу всю таблицу запроса и пишу данные в двумерный массив
+                while (res.next()) {
+                    arrayObjects[o][0] = res.getInt("id_Objects"); //пишу ID-предмета
+                    arrayObjects[o][1] = res.getInt("kol"); //пишу ID-количество
+                    o++;
+                }
+                //пишу информацию о предметах в массив
+                String res = SelectInfoObjects(setCount);
+                if (res.equals("ERROR")) select = "ERROR";
+                else select = "YES_OBJECTS";
+                /*
+                System.out.println("Вывожу массив вещей в рюкзаке");
+                for (int i = 0; i < arrayObjects.length; i++) {
+                    for (int j = 0; j < arrayObjects[i].length; j++) {
+                        System.out.print(arrayObjects[i][j] + " ");
+                    }
+                    System.out.println();
+                }*/
+            }else select = "NO_OBJECTS";
+        }catch (SQLException e){
+            select = "ERROR";
+            System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Вещи в рюкзаке");
+        }
+        System.out.println(select);
+        return select;
+    }
+
     //выборка всех данных о игроке
     private void SelectAllFromPlayers() throws SQLException {
         query = "SELECT * FROM players p, vip_exp v, exp, pvp_exp pvp" +
@@ -1334,6 +2531,7 @@ class ServeOneThread extends Thread {
                 " AND p.pvp_lvl = pvp.pvp_lvl;"; //код SQL-запроса
         res = statement.executeQuery(query); //запускаю запрос
         //в цикле прохожу всю таблицу и пишу данные в сеттеры
+        arrayObjects = new int[9][7];
         while (res.next()) {
             players.setName(res.getString("name"));
             players.setLvl(res.getInt("lvl"));
@@ -1362,6 +2560,7 @@ class ServeOneThread extends Thread {
             players.setPvp_name(res.getString("pvp_name"));
             players.setLastDate(res.getDate("LastDate"));
             players.setdDateBirth(res.getDate("DateBirth"));
+            players.setDateBegin(res.getDate("DateBegin"));
             players.setDays(res.getInt("days"));
             players.setMaxMyUron(res.getInt("maxMyUron"));
             players.setMaxEnemyUron(res.getInt("maxEnemyUron"));
@@ -1375,6 +2574,34 @@ class ServeOneThread extends Thread {
             players.setBirthday(res.getInt("isBirthday"));
             players.setPass(res.getString("pass"));
             players.setIsPass(res.getInt("isPass"));
+            players.setHelmet(res.getInt("helmet"));
+            arrayObjects[0][0] = players.getHelmet();
+            players.setRight_hand(res.getInt("right_hand"));
+            arrayObjects[1][0] = players.getRight_hand();
+            players.setLeft_hand(res.getInt("left_hand"));
+            arrayObjects[2][0] = players.getLeft_hand();
+            players.setArmor(res.getInt("armor"));
+            arrayObjects[3][0] = players.getArmor();
+            players.setBoots(res.getInt("boots"));
+            arrayObjects[4][0] = players.getBoots();
+            players.setGloves(res.getInt("gloves"));
+            arrayObjects[5][0] = players.getGloves();
+            players.setAmulet(res.getInt("amulet"));
+            arrayObjects[6][0] = players.getAmulet();
+            players.setRight_ring(res.getInt("right_ring"));
+            arrayObjects[7][0] = players.getRight_ring();
+            players.setLeft_ring(res.getInt("left_ring"));
+            arrayObjects[8][0] = players.getLeft_ring();
+            for (int i = 0; i < arrayObjects.length; i++){ //заполняю в массив к-во предметов
+                arrayObjects[i][1] = 1;
+            }
+            /*System.out.println("Вывожу массив вещей, одетых на герое");
+            for (int i = 0; i < arrayObjects.length; i++) {
+                for (int j = 0; j < arrayObjects[i].length; j++) {
+                    System.out.print(arrayObjects[i][j] + " ");
+                }
+                System.out.println();
+            }*/
         }
     }
 
@@ -1613,6 +2840,33 @@ class ServeOneThread extends Thread {
         return (players.getLvl() + players.getPvp_lvl());
     }
 
+    //проверяю свободное место в рюкзаке
+    private String FreeInventar() {
+        String free = "ERROR";
+        try {
+            query = "SELECT COUNT(*) AS kol FROM inventory i " +
+                    "LEFT JOIN objects o ON i.id_Objects = o.id_Objects " +
+                    "WHERE i.id_players = '" + players.getId() +
+                    "' AND (o.isQuest IS NULL OR o.isQuest = '' OR o.isQuest = 0);"; //код SQL-запроса
+            res = statement.executeQuery(query); //запускаю запрос
+            while (res.next()) {
+                setCount = res.getInt("kol");
+                players.setFreeInventar(setCount);
+            }
+            if (setCount < players.getSize_inventory()) { //если есть место в рюкзаке
+                free = "YES_FREE";
+            } else {  //если нет места в инвентаре
+                free = "NO_FREE";
+            }
+        } catch (SQLException e) {
+            free = "ERROR";
+            System.out.println("Не удалось выполнить запрос. ID: " + players.getId() + " Немогу узнать свободное место в рюкзаке");
+        }
+        return free;
+    }
+
+
+
     //выборка дропа
     private boolean Drop() throws SQLException {
         boolean drop = false;
@@ -1676,7 +2930,7 @@ class ServeOneThread extends Thread {
                             while (res.next()) {
                                 setCount = res.getInt("kol");
                             }
-                            if (setCount < countForQuest[i]) {  //если к-во таких предметов не превышает мак. к-ва
+                            if (setCount < countForQuest[i]) {  //если к-во таких предметов не превышает мак. к-ва для квеста
                                 //добавляю еще одно кол-во
                                 query = "UPDATE inventory SET kol = kol + 1 WHERE id_players = '" + players.getId() +
                                         "' AND id_Objects = " + id_Objects[i] + ";"; //код SQL-запроса
@@ -1706,19 +2960,9 @@ class ServeOneThread extends Thread {
                         }
                     } else {
                         //проверяю к-во не квестовых предметов в рюкзаке
-                        query = "SELECT COUNT(*) AS kol FROM inventory i " +
-                                "LEFT JOIN objects o ON i.id_Objects = o.id_Objects " +
-                                "WHERE i.id_players = '" + players.getId() +
-                                "' AND (o.isQuest IS NULL OR o.isQuest = '' OR o.isQuest = 0);"; //код SQL-запроса
-                        res = statement.executeQuery(query); //запускаю запрос
-                        while (res.next()) {
-                            setCount = res.getInt("kol");
-                        }
-                        if (setCount < players.getSize_inventory()) { //если есть место в рюкзаке
-                            k = true; //добавляю новый предмет в инвентарь этого перса
-                        } else {  //если нет места в инвентаре
-                            nameDrop[i] = ", рюкзак переполнен";  //добавляю в масив название дропа
-                        }
+                        String res = FreeInventar();
+                        if (res.equalsIgnoreCase("YES_FREE")) k = true; //добавляю новый предмет в инвентарь этого перса
+                        else if(res.equalsIgnoreCase("NO_FREE"))  nameDrop[i] = ", рюкзак переполнен";  //добавляю в масив название дропа
                     }
                 }
                 if (k == true) {
